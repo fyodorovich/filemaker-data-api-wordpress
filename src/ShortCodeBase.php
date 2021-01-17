@@ -32,6 +32,7 @@ class ShortCodeBase
             case 'curre':
                 if(empty($record[$field])) {
                     $content = '';
+                    $content = (money_format('%#10n', 0));
                 } else {
                     setlocale(LC_ALL, $this->settings->getLocale());
                     $content = (money_format('%#10n', $record[$field]));
