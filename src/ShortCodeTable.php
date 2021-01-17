@@ -111,7 +111,7 @@ class ShortCodeTable extends ShortCodeBase
                 $html .= '<tr>';
             foreach($fields as $id => $field) {
                 $type = array_key_exists($id, $types) ? $types[$id] : null;
-                $html .= sprintf('<td>%s</td>', $this->outputField($record, trim($field), $type, $link));
+                $html .= sprintf('<td%2$s>%1$s</td>',$this->outputField($record, trim($field), $type, $link), $type === 'Currency' ? ' class="rha"':'');
             }
             $html .= '</tr>';
         }
