@@ -177,7 +177,7 @@ class FileMakerDataAPI
         $this->baseURI =
             ('http' == substr($host, 4) ? $host : 'https://' . $host) .
             ('/' == substr($host, -1) ? '' : '/') .
-            'fmi/data/v1/databases/' .
+            'fmi/data/v2/databases/' .
             $database . '/';
     }
 
