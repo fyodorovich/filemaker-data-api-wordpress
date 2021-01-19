@@ -19,6 +19,8 @@ use FMDataAPI\AFLClient;
  */
 class ShortCodeUserDetail extends ShortCodeBase {
 
+    protected $client_record;
+
     /**
      * ShortCodeUserDetail constructor.
      *
@@ -38,22 +40,93 @@ class ShortCodeUserDetail extends ShortCodeBase {
      */
     public function retrieveClientRecord(array $attr) {
 
+
         try {
             $afl = new AFLClient();
-            $query = $afl->client_query();
-            if (empty($query['uniqueHash'])) {
-                return '';
+
+            $uuid = $afl->client_uuid();
+            $attr = [
+                'fields' => "id_client",
+            ];
+
+
+            if (empty($afl->client_uuid())) {
+                return 'could not provide key';
             }
 
-            $records = $this->api->find($this->clientLayout, $query );
+            $this->client_record = $this->api->findOneBy($afl->client_layout(), $this->client_query($uuid));
 
-            return $this->generateTable($records, $attr);
+
+            return $this->formatClientRecord();
         } catch (Exception $e) {
             return 'Unable to load records.';
         }
     }
 
-   
+    protected function formatClientRecord() {
+        if ($this->client_record['Contracts::getFoundCount'] > 0) {
+            $contracts = $this->formatClientContracts();
+        }
+        return '<div id="clientData">'
+                . '<div id="name" class="large bold">' . $this->client_record['Contracts::Firstname'] . " " . $this->client_record['Contracts::Surname'] . '</div>'
+                . '<div id="address" class="">' . $this->client_record['Contracts::Address'] . "<br>" . $this->client_record['Contracts::City'] . '</div>'
+                . '<div id="email" class="">' . $this->client_record['email'] . '</div>'
+                . '<div id="clientId" class="">Client ID: ' . $this->client_record['id_client'] . '</div>'
+                . '<div id="contractCount" class="">Contracts: ' . $this->client_record['Contracts::getFoundCount'] . '</div>'
+                . '</div>'
+                . $contracts;
+        ;
+    }
+
+    protected function formatClientContracts() {
+
+        $contractFields = [
+            'Contracts::Inst. Due',
+            'Contracts::Arrears',
+            'Contracts::Arr. Charges',
+            'Contracts::Transactions',
+            'Contracts::Total Due',
+        ];
+        $contractLabels = [
+            '#',
+            'Contract',
+            'Inst. Due',
+            'Arrears',
+            'Arr. Charges',
+            'Transactions',
+            'Total Due',
+        ];
+        $s = '<table><thead><tr class="head"><td class="inverse">&nbsp;</td>';
+            foreach ($contractLabels as $field) {
+                $s .= '<td class="center">' . $field . '</td>';
+            }
+        $s .= '</tr></thead>';
+        $s .= '<tbody>';
+
+        $i = 0;
+        foreach ($this->client_record['portalData']['Contracts'] as $contract) {
+            $s .= '<tr><td class="inverse"><a href="?page_id=31&amp;c='.$contract['Contracts::Contract'].'">&rarr;</a></td><td>'.++$i.'</td><td>' . $contract['Contracts::Contract'] . '</td>';
+            foreach ($contractFields as $field) {
+                $s .= '<td class="rha">' . $this->formatCurrency($contract[$field]) . '</td>';
+            }
+            $s .= '</tr>';
+        }
+
+        $s .= '</tbody>';
+        $s .= '</table>';
+
+        return '<div id="contractData">' . $s . '</div>';
+    }
+
+    protected function formatCurrency($field) {
+        if (empty($field)) {
+            $content = 0 ;
+        } else {
+            setlocale(LC_ALL, $this->settings->getLocale());
+            $content = (money_format('%#10n', $field));
+        }
+        return $content;
+    }
 
     /**
      * @param string $queryString
@@ -76,6 +149,8 @@ class ShortCodeUserDetail extends ShortCodeBase {
      */
     private function generateTable(array $records, array $attr) {
         $fields = explode('|', $attr['fields']);
+
+
         $types = array_key_exists('types', $attr) ? explode('|', $attr['types']) : [];
 
         $html = '<table>';
@@ -114,6 +189,19 @@ class ShortCodeUserDetail extends ShortCodeBase {
         $html .= '</tr></thead>';
 
         return $html;
+    }
+
+    /**
+     * Generate the query string required to obtain Client details from FileMaker Pro
+     * @return empty string','array','Exception
+     */
+    protected function client_query(string $uuid) {
+
+        try {
+            return ['uniqueHash' => $uuid];
+        } catch (Exception $ex) {
+            return $ex;
+        }
     }
 
 }
