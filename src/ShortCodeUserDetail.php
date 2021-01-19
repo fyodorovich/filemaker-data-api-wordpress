@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by Apache Netbeans.
  * User: Malcolm Fitzgerald
@@ -9,25 +10,22 @@
 namespace FMDataAPI;
 
 use \Exception;
+use FMDataAPI\AFLClient;
 
 /**
  * Class ShortCodeTable
  *
  * @package FMDataAPI
  */
-class ShortCodeUserDetail extends ShortCodeBase
-{
+class ShortCodeUserDetail extends ShortCodeBase {
 
-    protected $clientLayout = 'WebData_Client';
-    protected $clientFields = 'id_client|email|Contracts::Firstname|Contracts::Firstname|Contracts::Surname|Contracts::Address|Contracts::City|Contracts::getFoundCount';
     /**
      * ShortCodeUserDetail constructor.
      *
      * @param FileMakerDataAPI $api
      * @param Settings $settings
      */
-    public function __construct(FileMakerDataAPI $api, Settings $settings)
-    {
+    public function __construct(FileMakerDataAPI $api, Settings $settings) {
         parent::__construct($api, $settings);
 
         add_shortcode('FM-DATA-USER-DETAIL', [$this, 'retrieveClientRecord']);
@@ -38,20 +36,16 @@ class ShortCodeUserDetail extends ShortCodeBase
      *
      * @return string
      */
-    public function retrieveClientRecord(array $attr)
-    {
-// We are controlling the LAYOUT and the FIELDS
-//
-//        if(!$this->validateAttributesOrExit(['layout', 'fields'], $attr)) {
-//            return '';
-//        }
+    public function retrieveClientRecord(array $attr) {
 
         try {
-            if(array_key_exists('query', $attr)) {
-                return $this->performTableQuery($attr);
+            $afl = new AFLClient();
+            $query = $afl->client_query();
+            if (empty($query['uniqueHash'])) {
+                return '';
             }
 
-            $records = $this->api->findAll($attr['layout']);
+            $records = $this->api->find($this->clientLayout, $query );
 
             return $this->generateTable($records, $attr);
         } catch (Exception $e) {
@@ -59,37 +53,16 @@ class ShortCodeUserDetail extends ShortCodeBase
         }
     }
 
-    /**
-     * @param array $attr
-     *
-     * @return string
-     *
-     * @throws Exception
-     */
-    private function performTableQuery(array $attr)
-    {
-        $current_user_id = get_current_user_id();
-        if ( $current_user_id === 0 ) {
-            error_log ('WARNING: Access to this page without a user login. IP: ' . $_SERVER['REMOTE_ADDR']);
-            return '';
-        }
-        
-        $user_query = "{'uniqueHash': ". get_metadata( 'user', $user_id, 'wpcf-uuid', 1 ) . "}" ;
-        $this->parseQueryToJSON($user_query);
-        $records = $this->api->find($attr['layout'], $query);
-
-        return $this->generateTable($records, $attr);
-    }
+   
 
     /**
      * @param string $queryString
      *
      * @return array
      */
-    private function parseQueryToJSON(string $queryString)
-    {
+    private function parseQueryToJSON(string $queryString) {
         $reformattedQuery = html_entity_decode(
-            str_replace("'", '"', $queryString)
+                str_replace("'", '"', $queryString)
         );
 
         return json_decode($reformattedQuery, true);
@@ -101,29 +74,22 @@ class ShortCodeUserDetail extends ShortCodeBase
      *
      * @return string
      */
-    private function generateTable(array $records, array $attr)
-    {
+    private function generateTable(array $records, array $attr) {
         $fields = explode('|', $attr['fields']);
-        $types = array_key_exists('types', $attr)
-            ? explode('|', $attr['types'])
-            : [];
+        $types = array_key_exists('types', $attr) ? explode('|', $attr['types']) : [];
 
         $html = '<table>';
-        $html .= array_key_exists('labels', $attr)
-            ? $this->generateHeaderRow($attr['labels'])
-            : $this->generateHeaderRow($attr['fields']);
+        $html .= array_key_exists('labels', $attr) ? $this->generateHeaderRow($attr['labels']) : $this->generateHeaderRow($attr['fields']);
         $html .= '<tbody>';
 
 
-        foreach($records as $record) {
-            $link = array_key_exists('id-field', $attr) && array_key_exists('detail-url', $attr)
-                ? str_replace('*id*', $record[$attr['id-field']], $attr['detail-url'])
-                : '';
+        foreach ($records as $record) {
+            $link = array_key_exists('id-field', $attr) && array_key_exists('detail-url', $attr) ? str_replace('*id*', $record[$attr['id-field']], $attr['detail-url']) : '';
 
-                $html .= '<tr>';
-            foreach($fields as $id => $field) {
+            $html .= '<tr>';
+            foreach ($fields as $id => $field) {
                 $type = array_key_exists($id, $types) ? $types[$id] : null;
-                $html .= sprintf('<td%2$s>%1$s</td>',$this->outputField($record, trim($field), $type, $link), $type === 'Currency' ? ' class="rha"':'');
+                $html .= sprintf('<td%2$s>%1$s</td>', $this->outputField($record, trim($field), $type, $link), $type === 'Currency' ? ' class="rha"' : '');
             }
             $html .= '</tr>';
         }
@@ -137,17 +103,17 @@ class ShortCodeUserDetail extends ShortCodeBase
      *
      * @return string
      */
-    private function generateHeaderRow($labels)
-    {
+    private function generateHeaderRow($labels) {
         $labels = explode('|', $labels);
         $html = '<thead><tr>';
-        foreach($labels as $label) {
+        foreach ($labels as $label) {
             $html .= trim(
-                sprintf('<th>%s</th>', $label)
+                    sprintf('<th>%s</th>', $label)
             );
         }
         $html .= '</tr></thead>';
 
         return $html;
     }
+
 }
