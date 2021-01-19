@@ -90,7 +90,7 @@ class ShortCodeTable extends ShortCodeBase
      * @return string
      */
     private function generateTable(array $records, array $attr)
-    {
+    {       
         $fields = explode('|', $attr['fields']);
         $types = array_key_exists('types', $attr)
             ? explode('|', $attr['types'])
