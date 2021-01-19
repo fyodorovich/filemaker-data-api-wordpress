@@ -23,6 +23,11 @@ require_once FM_DATA_API_PLUGIN_DIR . '/src/Settings.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeBase.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeField.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeTable.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeUserDetail.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeContractsTable.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeContractDetail.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeTransactionsTable.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/AFLClient.php';
 
 new FMDataAPI\Plugin();
 
