@@ -56,8 +56,12 @@ class ShortCodeUserDetail extends ShortCodeBase {
 
             $this->client_record = $this->api->findOneBy($afl->client_layout(), $this->client_query($uuid));
 
+            if ($afl->client_id() !== $this->client_record['id_client']) {
+                return 'Access Denied';
+            }
 
             return $this->formatClientRecord();
+
         } catch (Exception $e) {
             return 'Unable to load records.';
         }
@@ -97,15 +101,15 @@ class ShortCodeUserDetail extends ShortCodeBase {
             'Total Due',
         ];
         $s = '<table><thead><tr class="head"><td class="inverse">&nbsp;</td>';
-            foreach ($contractLabels as $field) {
-                $s .= '<td class="center">' . $field . '</td>';
-            }
+        foreach ($contractLabels as $field) {
+            $s .= '<td class="center">' . $field . '</td>';
+        }
         $s .= '</tr></thead>';
         $s .= '<tbody>';
 
         $i = 0;
         foreach ($this->client_record['portalData']['Contracts'] as $contract) {
-            $s .= '<tr><td class="inverse"><a href="?page_id=31&amp;c='.$contract['Contracts::Contract'].'">&rarr;</a></td><td>'.++$i.'</td><td>' . $contract['Contracts::Contract'] . '</td>';
+            $s .= '<tr><td class="inverse"><a href="?page_id=31&amp;c=' . $contract['Contracts::Contract'] . '">&rarr;</a></td><td>' . ++$i . '</td><td>' . $contract['Contracts::Contract'] . '</td>';
             foreach ($contractFields as $field) {
                 $s .= '<td class="rha">' . $this->formatCurrency($contract[$field]) . '</td>';
             }
@@ -120,7 +124,7 @@ class ShortCodeUserDetail extends ShortCodeBase {
 
     protected function formatCurrency($field) {
         if (empty($field)) {
-            $content = 0 ;
+            $content = 0;
         } else {
             setlocale(LC_ALL, $this->settings->getLocale());
             $content = (money_format('%#10n', $field));
