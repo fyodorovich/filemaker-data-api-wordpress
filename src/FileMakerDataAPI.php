@@ -1,8 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: stevewinter
- * Date: 31/05/2018
+ * Created by Netbeans.
+ * User: Malcolm Fitzgerald
+ * Date:18/01/2021
  * Time: 14:25
  */
 
@@ -108,6 +108,15 @@ class FileMakerDataAPI
         $this->cache[$queryHash] = $records;
 
         return $records;
+    }
+
+    public function storedQuery($query){
+        $queryHash = md5(
+            serialize($query)
+        );
+        if(array_key_exists($queryHash, $this->cache)) {
+            return $this->cache[$queryHash];
+        }
     }
 
     /**
