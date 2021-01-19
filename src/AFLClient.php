@@ -12,41 +12,62 @@ namespace FMDataAPI;
 use \WP_Http;
 use \Exception;
 
-class AFLClient {
+class AFLClient extends ShortCodeBase {
 
     /**
      * Name of FMP layout to target for client data
      * @var String
      */
-    public $clientLayout = 'WebData_Client';
+    protected $clientLayout = 'WebData_Client';
+
     /**
      * Names of FMP fields to access for client data
      * @var array
      */
-    public $clientFields = ['id_client','email','Contracts::Firstname','Contracts::Firstname','Contracts::Surname','Contracts::Address','Contracts::City','Contracts::getFoundCount'];
+    protected $clientFields = ['id_client', 'email', 'Contracts::Firstname', 'Contracts::Firstname', 'Contracts::Surname', 'Contracts::Address', 'Contracts::City', 'Contracts::getFoundCount'];
+
     /**
      * Name of FMP layout to target for contract data
      * @var String
      */
-    public $contractLayout = 'WebData_Contract';
-      /**
+    protected $contractLayout = 'WebData_Contract';
+
+    /**
      * Names of FMP fields to access for contract data
      * @var array
      */
-    public $contractFields = ['Contract','Client','Inst. Due','Arrears','Arr. Charges','Transactions','Total Due'];
-        /**
+    protected $contractFields = ['Contract', 'Client', 'Inst. Due', 'Arrears', 'Arr. Charges', 'Transactions', 'Total Due'];
+
+    /**
      * Name of FMP layout to target for transaction data
      * @var String
      */
-    public $transactionLayout = 'WebData_Transactions';
-        /**
+    protected $transactionLayout = 'WebData_Transactions';
+
+    /**
      * Names of FMP fields to access for transaction data
      * @var array
      */
-    public $transactionFields = ['Contract','Date','TX Code','DRCR','Amount','Details','Balance','Debit','Credit'];
+    protected $transactionFields = ['Contract', 'Date', 'TX Code', 'DRCR', 'Amount', 'Details', 'Balance', 'Debit', 'Credit'];
+
+    /**
+     * uuid of current user
+     * @var string
+     */
+    protected $current_user_uuid;
+
+    /**
+     * login of current user
+     * This is the Client ID in FMP
+     * @var int
+     */
+    protected $current_user_login;
+
 
     public function __construct() {
-        $this->setBaseURL($settings->getServer(), $settings->getDatabase());
+        $user_data = get_userdata( get_current_user_id() );
+        $this->current_user_login = $user_data->user_login;
+        $this->current_user_uuid = $this->get_wp_user_uuid(get_current_user_id());
     }
 
     /**
@@ -54,31 +75,35 @@ class AFLClient {
      * That is the UUID used in the ID field of the client table in FileMaker Pro
      * @return string
      */
-    public function client_uuid() {
-        $current_user_id = get_current_user_id();
+    private function get_wp_user_uuid( int $user_id) {
 
-        if ($current_user_id === 0) {
+        if ($user_id === 0 || empty($user_id)) {
             error_log('WARNING: Access to this page without a user login. IP: ' . $_SERVER['REMOTE_ADDR']);
             return '';
         }
 
-        return get_metadata('user', $current_user_id, 'wpcf-uuid', 1);
+        return get_metadata('user', $user_id, 'wpcf-uuid', 1);
     }
 
     /**
-     * Generate the query string required to obtain Client details from FileMaker Pro
-     * @return empty string','array','Exception
+     * Get the UUID needed to identify the client in FMP
+     * @return string
      */
-    public function client_query() {
+    public function client_uuid() {
+        return $this->current_user_uuid;
+    }
 
-        try {
-            $user_uuid = $this->client_uuid() ;
-            
-            return ['uniqueHash' => $user_uuid];
+    /**
+     * Get the Client ID needed to identify contracts for this client in FMP
+     * We don't want to display this information very much because these IDs are serial numbers
+     * @return type
+     */
+    public function client_id() {
+        return $this->current_user_login ;
+    }
 
-        } catch (Exception $ex) {
-            return $ex;
-        }
+    public function client_layout() {
+        return $this->clientLayout;
     }
 
 }
