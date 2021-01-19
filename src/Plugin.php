@@ -27,6 +27,10 @@ class Plugin
         $this->shortcodes = [
             new ShortCodeField($api, $settings),
             new ShortCodeTable($api, $settings),
+            new ShortCodeUserDetail($api, $settings),
+            new ShortCodeContractDetail($api, $settings),
+            new ShortCodeContractsTable($api, $settings),
+            new ShortCodeTransactionsTable($api, $settings),
         ];
     }
 
