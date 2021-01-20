@@ -106,4 +106,12 @@ class AFLClient extends ShortCodeBase {
         return $this->clientLayout;
     }
 
+    public function contract_layout() {
+        return $this->contractLayout;
+    }
+
+    public function transaction_layout() {
+        return $this->transactionLayout;
+    }
+
 }
