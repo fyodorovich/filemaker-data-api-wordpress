@@ -19,6 +19,10 @@ use FMDataAPI\AFLClient;
  */
 class ShortCodeContractDetail extends ShortCodeBase {
 
+    protected $client_record;
+    protected $contract_record;
+    protected $transaction_record;
+
     /**
      * ShortCodeTable constructor.
      *
@@ -28,7 +32,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
     public function __construct(FileMakerDataAPI $api, Settings $settings) {
         parent::__construct($api, $settings);
 
-        add_shortcode('FM-DATA-CONTRACT-DETAIL', [$this, 'retrieveTableContent']);
+        add_shortcode('FM-DATA-CONTRACT-DETAIL', [$this, 'retrieveContract']);
     }
 
     /**
@@ -36,77 +40,106 @@ class ShortCodeContractDetail extends ShortCodeBase {
      *
      * @return string
      */
-    public function retrieveTableContent(array $attr) {
+    public function retrieveContract() {
+
+        $contract_id = filter_input(INPUT_GET, 'cid', FILTER_SANITIZE_STRING);
 
         try {
             $afl = new AFLClient();
 
             $uuid = $afl->client_uuid();
-            $attr = [
-                'fields' => "id_client",
-            ];
-
 
             if (empty($afl->client_uuid())) {
                 return 'could not provide key';
             }
 
-            $this->client_record = $this->api->findOneBy($afl->client_layout(), $this->client_query($uuid));
+            $loginId = $afl->client_id();
+
+            $attr = [
+                'fields' => "id_client",
+            ];
 
 
-            return $this->formatClientRecord();
+            $this->client_record = get_user_meta(get_current_user_id(), 'client_' . $afl->client_id());
+
+
+            if ($afl->client_id() !== $this->client_record[0]['id_client']) {
+                return 'Access Denied';
+            }
+
+            foreach ($this->client_record[0]['portalData']['Contracts'] as $contract) {
+                if ($contract['Contracts::Contract'] === $contract_id) {
+                    $this->contract_record = $contract;
+                    break;
+                }
+            }
+            $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($contract_id));
+
+            return $this->formatContractRecord();
         } catch (Exception $e) {
-            return 'Unable to load records.';
+            return 'Unable to load records. Please reload the page.';
         }
     }
 
-    protected function formatClientRecord() {
-        if ($this->client_record['Contracts::getFoundCount'] > 0) {
-            $contracts = $this->formatClientContracts();
+    protected function formatContractRecord() {
+        if ($this->contract_record['Transactions::getFoundCount'] > 0) {
+            $transactions = $this->formatTransactionRecords();
+        } else {
+            $transactions = "No transactions recorded.";
         }
-        $contract_id = filter_input(INPUT_GET, 'c', FILTER_SANITIZE_STRING);
-        return '<div id="clientData">'
-                . '<div id="name" class="large bold">' . $this->client_record['Contracts::Firstname'] . " " . $this->client_record['Contracts::Surname'] . '</div>'
-                . '<div id="address" class="">' . $this->client_record['Contracts::Address'] . "<br>" . $this->client_record['Contracts::City'] . '</div>'
-                . '<div id="email" class="">' . $this->client_record['email'] . '</div>'
-                . '<div id="clientId" class="">Client ID # ' . $this->client_record['id_client'] . '</div>'
-                . '<div id="contractCount" class="">Contracts: ' . $this->client_record['Contracts::getFoundCount'] . '</div>'
+        $nz_date = $this->fmDate2nzDate($this->contract_record["Transactions::Date"]);
+
+        $contractStatus = '<table style="margin-top: 3em; margin-bottom: 2em;"><tbody>'
+                .'<tr><td>Instalment due this period</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Inst. Due'], true) . '</td></tr>'
+                .'<tr><td>Arrears</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Arrears'], true) . '</td></tr>'
+                .'<tr><td>Arrears Charges</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Arr. Charges'], true) . '</td></tr>'
+                .'<tr><td>Transactions</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Transactions'], true) . '</td></tr>'
+                .'<tr><td>Total</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Total Due'], true) . '</td></tr>'
+                .'</tbody></table>'
+                .'<hr><div>An Early Settlement Fee is payable on full early repayment</div>'
+                ;
+
+        return '<hr><div class="center">Adelphi Finance Ltd</div><div style="float:right"> Contract ' . $this->contract_record["Contracts::Contract"] . '</div><hr>'
+                . '<div class="center">Statement of Loan Account<div style="float:right"> Dated ' . date('d M Y') . '</div></div>'
+                . '<div id="clientData" style="padding-top:2em;">'
+                . '<div id="name" class="large bold">' . $this->client_record[0]['Contracts::Firstname'] . " " . $this->client_record[0]['Contracts::Surname'] . '</div>'
+                . '<div id="address" class="">' . $this->client_record[0]['Contracts::Address'] . "<br>" . $this->client_record[0]['Contracts::City'] . '</div>'
+                . '<div id="email" class="">' . $this->client_record[0]['email'] . '</div>'
+                . '<div id="clientId" class="">Client ID # ' . $this->client_record[0]['id_client'] . '</div>'
+                // . '<div id="contractId">Contract # ' . $this->contract_record["Contracts::Contract"] . '</div>'
+                //  . '<div id="contractDate">Date: ' . $nz_date . '</div>'
+                . '<div id="transactionCount" class="">Transactions: ' . $this->contract_record['Transactions::getFoundCount'] . '</div>'
                 . '</div>'
-                . '<div>Contract # '.$contract_id.'</div>'
-                . $contracts;
+                . '<div id="transactions" style="padding-top:2em;">' . $transactions . '</div>'
+                . $contractStatus 
         ;
+
+
     }
 
-    protected function formatClientContracts() {
+    protected function formatTransactionRecords() {
 
-        $contractFields = [
-            'Contracts::Inst. Due',
-            'Contracts::Arrears',
-            'Contracts::Arr. Charges',
-            'Contracts::Transactions',
-            'Contracts::Total Due',
-        ];
-        $contractLabels = [
-            '#',
-            'Contract',
-            'Inst. Due',
-            'Arrears',
-            'Arr. Charges',
-            'Transactions',
-            'Total Due',
-        ];
-        $s = '<table><thead><tr class="head"><td class="inverse">&nbsp;</td>';
-        foreach ($contractLabels as $field) {
+        $transactionFields = ['TX Code', 'Details', 'Debit', 'Credit', 'Balance'];
+        $transactionLabels = ['Date', 'Code', 'Reference', 'Debit', 'Credit', 'Balance'];
+
+        $s = '<table class="w3-table w3-bordered"><thead><tr class="head">';
+        foreach ($transactionLabels as $field) {
             $s .= '<td class="center">' . $field . '</td>';
         }
         $s .= '</tr></thead>';
         $s .= '<tbody>';
 
         $i = 0;
-        foreach ($this->client_record['portalData']['Contracts'] as $contract) {
-            $s .= '<tr><td class="inverse"><a href="?page_id=31&amp;c=' . $contract['Contracts::Contract'] . '">&rarr;</a></td><td>' . ++$i . '</td><td>' . $contract['Contracts::Contract'] . '</td>';
-            foreach ($contractFields as $field) {
-                $s .= '<td class="rha">' . $this->formatCurrency($contract[$field]) . '</td>';
+        foreach ($this->transaction_record as $transaction) {
+
+            $nz_date = $this->fmDate2nzDate($transaction['Date']);
+            $s .= '<tr><td>' . $nz_date . '</td>';
+            foreach ($transactionFields as $field) {
+                if (in_array($field, ['Amount', 'Balance', 'Debit', 'Credit'])) {
+                    $s .= '<td class="rha">' . $this->formatCurrency(trim($transaction[$field])) . '</td>';
+                } else {
+                    $s .= '<td>' . trim($transaction[$field]) . '</td>';
+                }
             }
             $s .= '</tr>';
         }
@@ -114,17 +147,38 @@ class ShortCodeContractDetail extends ShortCodeBase {
         $s .= '</tbody>';
         $s .= '</table>';
 
-        return '<div id="contractData">' . $s . '</div>';
+        return $s;
     }
 
-    protected function formatCurrency($field) {
-        if (empty($field)) {
-            $content = 0;
-        } else {
-            setlocale(LC_ALL, $this->settings->getLocale());
-            $content = (money_format('%#10n', $field));
+    protected function formatCurrentContractState() {
+
+
+        $s = '<table class="w3-table w3-bordered"><thead><tr class="head">';
+        foreach ($contractLabels as $field) {
+            $s .= '<td class="center">' . $field . '</td>';
         }
-        return $content;
+        $s .= '</tr></thead>';
+        $s .= '<tbody>';
+
+        $i = 0;
+        foreach ($this->contract_record as $transaction) {
+
+            $nz_date = $this->fmDate2nzDate($transaction['Date']);
+            $s .= '<tr><td>' . $nz_date . '</td>';
+            foreach ($contractFields as $field) {
+                if (in_array($field, ['Amount', 'Balance', 'Debit', 'Credit'])) {
+                    $s .= '<td class="rha">' . $this->formatCurrency(trim($transaction[$field])) . '</td>';
+                } else {
+                    $s .= '<td>' . trim($transaction[$field]) . '</td>';
+                }
+            }
+            $s .= '</tr>';
+        }
+
+        $s .= '</tbody>';
+        $s .= '</table>';
+
+        return $s;
     }
 
     /**
@@ -203,13 +257,29 @@ class ShortCodeContractDetail extends ShortCodeBase {
     }
 
     /**
-     * Generate the query string required to obtain Client details from FileMaker Pro
-     * @return empty string','array','Exception
+     * Generate the query string required to obtain contract details from FileMaker Pro
+     * @param uuid to identify client
+     * @param contract id to identify contract
+     * @return empty string,'array','Exception
      */
-    protected function client_query(string $uuid) {
+    protected function contract_query(string $uuid, string $contract) {
 
         try {
-            return ['uniqueHash' => $uuid];
+            return ['uniqueHash' => $uuid, 'Contract' => $contract];
+        } catch (Exception $ex) {
+            return $ex;
+        }
+    }
+
+    /**
+     * Generate the query string required to obtain transaction details from FileMaker Pro
+     * @param contract id to identify contract
+     * @return empty string,'array','Exception
+     */
+    protected function transaction_query(string $contract) {
+
+        try {
+            return ['Contract' => $contract];
         } catch (Exception $ex) {
             return $ex;
         }
