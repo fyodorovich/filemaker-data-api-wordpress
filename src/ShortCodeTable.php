@@ -50,7 +50,7 @@ class ShortCodeTable extends ShortCodeBase
 
             return $this->generateTable($records, $attr);
         } catch (Exception $e) {
-            return 'Unable to load records.';
+            return 'Unable to load records. Please refresh/reload this page.';
         }
     }
 
