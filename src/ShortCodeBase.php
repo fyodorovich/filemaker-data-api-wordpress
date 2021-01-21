@@ -77,4 +77,41 @@ class ShortCodeBase
 
         return true;
     }
-}
+
+    /**
+     * Convert MM/DD/YYYY to DD/MM/YYYY
+     * @param type $date
+     * @return string
+     */
+    protected function fmDate2nzDate($date) {
+        if (!empty($date)) {
+            $us_date = explode("/", $date);
+            $nz_date = implode("/", [$us_date[1], $us_date[0], $us_date[2]]);
+        } else {
+            $nz_date = '';
+        }
+        return $nz_date;
+    }
+
+    /**
+     * Ensure that dollar amounts are two decimal places with $ prefix
+     * @param type $field
+     * @return string
+     */
+        protected function formatCurrency($field, $returnZero = false) {
+
+        if (empty($field) || 0 == $field ) {
+            $content = $returnZero ? '0.00': '';
+        } else {
+            if (class_exists('NumberFormatter')) {
+                $fmt = new \NumberFormatter($this->settings->getLocale(), NumberFormatter::CURRENCY);
+                $content = $fmt->formatCurrency($field, "NZ");
+            } else {
+                $content = '&nbsp;' . number_format($field, 2);
+            }
+        }
+        return $content;
+    }
+
+
+        }
