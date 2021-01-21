@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Integration with FileMaker Data API
-Plugin URI: https://msdev.co.uk/wp-fm-data-api
+Plugin Name: Integrate with FileMaker Data API
+Plugin URI: https://businessdatasystems.co.nz/wp-fm-data-api
 Description: Pull data directly from FileMaker into your WordPress installation using the FileMaker Data API
-Version: 0.1
-Author: Steve Winter
-Author URI: https://msdev.co.uk
+Version: 0.1.1
+Author: Malcolm Fitzgerald, Steve Winter
+Author URI: https://businessdatasystems.co.nz
 License: GPL2 or later
 */
 
