@@ -60,10 +60,11 @@ class ShortCodeUserDetail extends ShortCodeBase {
                 return 'Access Denied';
             }
 
-            return $this->formatClientRecord();
+            update_user_meta(get_current_user_id(), 'client_' . $afl->client_id(), $this->client_record, false);
 
+            return $this->formatClientRecord();
         } catch (Exception $e) {
-            return 'Unable to load records.';
+            return 'Unable to load records. Please refresh/reload this page.';
         }
     }
 
@@ -72,13 +73,14 @@ class ShortCodeUserDetail extends ShortCodeBase {
             $contracts = $this->formatClientContracts();
         }
         return '<div id="clientData">'
-                . '<div id="name" class="large bold">' . $this->client_record['Contracts::Firstname'] . " " . $this->client_record['Contracts::Surname'] . '</div>'
+                . '<div id="name" class="large strong">' . $this->client_record['Contracts::Firstname'] . " " . $this->client_record['Contracts::Surname'] . '</div>'
                 . '<div id="address" class="">' . $this->client_record['Contracts::Address'] . "<br>" . $this->client_record['Contracts::City'] . '</div>'
                 . '<div id="email" class="">' . $this->client_record['email'] . '</div>'
-                . '<div id="clientId" class="">Client ID: ' . $this->client_record['id_client'] . '</div>'
+                . '<div id="clientId" class="strong">Account Number: ' . $this->client_record['id_client'] . '</div>'
+                . '</div><div id="contractData">'
                 . '<div id="contractCount" class="">Contracts: ' . $this->client_record['Contracts::getFoundCount'] . '</div>'
-                . '</div>'
-                . $contracts;
+                . $contracts
+                . '</div>';
         ;
     }
 
@@ -87,18 +89,16 @@ class ShortCodeUserDetail extends ShortCodeBase {
         $contractFields = [
             'Contracts::Inst. Due',
             'Contracts::Arrears',
-            'Contracts::Arr. Charges',
-            'Contracts::Transactions',
             'Contracts::Total Due',
+            
         ];
         $contractLabels = [
-            '#',
             'Contract',
-            'Inst. Due',
+            'Date',
+            'Inst. Due*',
             'Arrears',
-            'Arr. Charges',
-            'Transactions',
             'Total Due',
+            'Active'
         ];
         $s = '<table><thead><tr class="head"><td class="inverse">&nbsp;</td>';
         foreach ($contractLabels as $field) {
@@ -109,28 +109,29 @@ class ShortCodeUserDetail extends ShortCodeBase {
 
         $i = 0;
         foreach ($this->client_record['portalData']['Contracts'] as $contract) {
-            $s .= '<tr><td class="inverse"><a href="?page_id=31&amp;c=' . $contract['Contracts::Contract'] . '">&rarr;</a></td><td>' . ++$i . '</td><td>' . $contract['Contracts::Contract'] . '</td>';
-            foreach ($contractFields as $field) {
-                $s .= '<td class="rha">' . $this->formatCurrency($contract[$field]) . '</td>';
+
+            if (!empty($contract['Transactions::Date'])) {
+                $us_date = explode("/", $contract['Transactions::Date']);
+                $nz_date = implode("/", [$us_date[1], $us_date[0], $us_date[2]]);
+            } else {
+                $nz_date = '';
             }
-            $s .= '</tr>';
+            $s .= '<tr><td class="inverse"><a href="?page_id=31&amp;cid=' . $contract['Contracts::Contract'] . '">&rarr;</a></td>'
+                    . '<td>' . $contract['Contracts::Contract'] . '</td><td class="center">' . $nz_date . '</td>';
+            foreach ($contractFields as $field) {
+                $s .= '<td class="rha">' . $this->formatCurrency(trim($contract[$field])) . '</td>';
+            }
+
+            $active = $contract['Contracts::active_contract'] ? '<td class="center">&check;</td>':'<td></td>';
+           $s .= $active . '</tr>';
         }
 
         $s .= '</tbody>';
         $s .= '</table>';
-
-        return '<div id="contractData">' . $s . '</div>';
+        $s .= "* Instalment due";
+        return '<div id="contractRecords">' . $s . '</div>';
     }
 
-    protected function formatCurrency($field) {
-        if (empty($field)) {
-            $content = 0;
-        } else {
-            setlocale(LC_ALL, $this->settings->getLocale());
-            $content = (money_format('%#10n', $field));
-        }
-        return $content;
-    }
 
     /**
      * @param string $queryString
