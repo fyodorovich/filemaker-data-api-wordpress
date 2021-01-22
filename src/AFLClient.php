@@ -63,10 +63,12 @@ class AFLClient extends ShortCodeBase {
      */
     protected $current_user_login;
 
+    protected $current_user_data;
+
 
     public function __construct() {
-        $user_data = get_userdata( get_current_user_id() );
-        $this->current_user_login = $user_data->user_login;
+        $this->current_user_data = get_userdata( get_current_user_id() );
+        $this->current_user_login = $this->current_user_data->user_login;
         $this->current_user_uuid = $this->get_wp_user_uuid(get_current_user_id());
     }
 
