@@ -50,7 +50,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
             $uuid = $afl->client_uuid();
 
             if (empty($afl->client_uuid())) {
-                return 'could not provide key';
+                return $this->connectionError();
             }
 
             $loginId = $afl->client_id();
@@ -73,11 +73,14 @@ class ShortCodeContractDetail extends ShortCodeBase {
                     break;
                 }
             }
-            $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($contract_id));
+
+            $this->contract_record = $this->client_record[0]['portalData']['Contracts'][$contract_id];
+
+            $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($this->contract_record["Contracts::Contract"]));
 
             return $this->formatContractRecord();
         } catch (Exception $e) {
-            return 'Unable to load records. Please reload the page.';
+            return $this->connectionError(true);
         }
     }
 
@@ -99,7 +102,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
                 .'<hr><div>An Early Settlement Fee is payable on full early repayment</div>'
                 ;
 
-        return '<hr><div class="center">Adelphi Finance Ltd</div><div style="float:right"> Contract ' . $this->contract_record["Contracts::Contract"] . '</div><hr>'
+        return '<hr><div style="float:right"> Contract ' . $this->contract_record["Contracts::Contract"] . '</div><div class="center">Adelphi Finance Ltd</div><hr>'
                 . '<div class="center">Statement of Loan Account<div style="float:right"> Dated ' . date('d M Y') . '</div></div>'
                 . '<div id="clientData" style="padding-top:2em;">'
                 . '<div id="name" class="large bold">' . $this->client_record[0]['Contracts::Firstname'] . " " . $this->client_record[0]['Contracts::Surname'] . '</div>'
