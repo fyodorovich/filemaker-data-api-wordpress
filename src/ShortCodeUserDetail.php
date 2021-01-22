@@ -121,7 +121,7 @@ class ShortCodeUserDetail extends ShortCodeBase {
 
 
             foreach ($contractFields as $field) {
-                $s .= '<td class="rha">$' . $this->formatCurrency(trim($contract[$field])) . '</td>';
+                $s .= '<td class="rha">' . $this->formatCurrency(trim($contract[$field])) . '</td>';
             }
 
             $active = $contract['Contracts::active_contract'] ? '<td class="center">&check;</td>':'<td></td>';
