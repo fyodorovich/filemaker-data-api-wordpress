@@ -51,7 +51,7 @@ class ShortCodeUserDetail extends ShortCodeBase {
 
 
             if (empty($afl->client_uuid())) {
-                return 'could not provide key';
+                return $this->connectionError();
             }
 
             $this->client_record = $this->api->findOneBy($afl->client_layout(), $this->client_query($uuid));
@@ -64,7 +64,7 @@ class ShortCodeUserDetail extends ShortCodeBase {
 
             return $this->formatClientRecord();
         } catch (Exception $e) {
-            return 'Unable to load records. Please refresh/reload this page.';
+            return $this->connectionError(true);
         }
     }
 
@@ -116,14 +116,18 @@ class ShortCodeUserDetail extends ShortCodeBase {
             } else {
                 $nz_date = '';
             }
-            $s .= '<tr><td class="inverse"><a href="?page_id=31&amp;cid=' . $contract['Contracts::Contract'] . '">&rarr;</a></td>'
+            $s .= '<tr><td class="inverse"><a href="/transaction-statement/?&amp;cid=' . $i . '">&rarr;</a></td>'
                     . '<td>' . $contract['Contracts::Contract'] . '</td><td class="center">' . $nz_date . '</td>';
+
+
             foreach ($contractFields as $field) {
                 $s .= '<td class="rha">' . $this->formatCurrency(trim($contract[$field])) . '</td>';
             }
 
             $active = $contract['Contracts::active_contract'] ? '<td class="center">&check;</td>':'<td></td>';
            $s .= $active . '</tr>';
+
+           $i++;
         }
 
         $s .= '</tbody>';
