@@ -98,7 +98,7 @@ class ShortCodeBase {
                 $fmt = new \NumberFormatter($this->settings->getLocale(), NumberFormatter::CURRENCY);
                 $content = $fmt->formatCurrency($field, "NZ");
             } else {
-                $content = '&nbsp;' . number_format($field, 2);
+                $content =  number_format($field, 2);
             }
         }
         return $content;
