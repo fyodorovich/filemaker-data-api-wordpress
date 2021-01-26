@@ -5,11 +5,42 @@ At this early stage of development only 'pull' is possible. Over time this plugi
 
 The primary means of 'pulling' data is through the use of two WordPress shortcodes
 
+## Modifications made for Adelphi Finance
+For convenience and increased control we have added two shortcodes which control the display of a users contracts and the display of a contract.
+
 ## Installation
 Download, copy to your plugins directory, enable, configure and you're ready to go.
 
+For Adelphi sites, copy to the __mu_plugins directory__. The plugin will only be updated by us, and is essential for the operation of the Adelpi Client site.
+
+## Dependencies
+### WP User Login
+**This is the only piece of non-obvious client information that is stored**
+The user login corresponds with the Client ID and is used as a sanity check. If the records found by the UUID are not associated with the current userlogin they are not displayed.
+
+### User data
+
+#### User Login, First Name and Last Name
+
+First and Last Name are stored to provide a sensible welcome.
+
+The user login corresponds with the Client ID and is used as a sanity check. If the records found by the UUID are not associated with the current userlogin they are not displayed.
+**This is the only piece of non-obvious client information that is stored**
+
+
+#### User Metadata: UUID
+To prevent accidental transfer of client information we are storing a UUID in user metadata. The field is user_meta::wpcf_uuid. This UUID is generated in the FileMaker and is the ID of the table "clientmetadata."
+
 ## Shortcodes
-The two shortcodes listed below provide access to your FileMaker data.
+The shortcodes listed below provide access to your FileMaker data.
+
+### [FM-DATA-USER-DETAIL]
+Pull all contract records associated with the UUID of the logged in user. The contract records include the client name and address. A table of contracts is built including links which are based on permalinks. 
+
+### [FM-DATA-CONTRACT-DETAIL]
+Pull all transaction records associated with the contract of the logged in user. The contract is printable as a Contract Statement.
+
+A table of contracts is built including links which are based on permalinks
 
 ### [FM-DATA-TABLE]
 Pull all records from the specified layout and generate a table of records.
