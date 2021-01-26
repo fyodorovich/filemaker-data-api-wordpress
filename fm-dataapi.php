@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Integrate with FileMaker Data API
+Plugin Name: FileMaker Data API Connector
 Plugin URI: https://businessdatasystems.co.nz/wp-fm-data-api
-Description: Pull data directly from FileMaker into your WordPress installation using the FileMaker Data API
+Description: This plugin has been customised for Adelphi Finance
 Version: 0.1.2
 Author: Malcolm Fitzgerald, Steve Winter
 Author URI: https://businessdatasystems.co.nz
