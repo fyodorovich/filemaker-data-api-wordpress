@@ -235,6 +235,10 @@ class FileMakerDataAPI {
                 $this->token = $responseObj->response->token;
                 $_SESSION['fm-data-api-token'] = $this->token;
 
+                session_write_close();
+                //other plugins can restart a session again via session_start()
+                // see https://core.trac.wordpress.org/ticket/47320
+
                 return $this->token;
             }
 
