@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by Netbeans.
  * User: Malcolm Fitzgerald
@@ -11,8 +12,7 @@ namespace FMDataAPI;
 use \WP_Http;
 use \Exception;
 
-class FileMakerDataAPI
-{
+class FileMakerDataAPI {
 
     /** @var Settings */
     private $settings;
@@ -22,13 +22,10 @@ class FileMakerDataAPI
 
     /** @var string */
     private $token;
-
     private $cache = [];
-
     private $retried = false;
 
-    public function __construct(Settings $settings)
-    {
+    public function __construct(Settings $settings) {
         $this->settings = $settings;
         $this->setBaseURL($settings->getServer(), $settings->getDatabase());
     }
@@ -40,16 +37,15 @@ class FileMakerDataAPI
      * @return array
      * @throws Exception
      */
-    public function findAll($layout)
-    {
+    public function findAll($layout) {
         $this->setOrFetchToken();
 
         // by default API only returns 100 records at a time, so we need to keep getting records till we run out
         $offset = 1;
         $retrieved = 100;
         $results = [];
-        
-        while($retrieved == 100) {
+
+        while ($retrieved == 100) {
             $uri = $this->baseURI . sprintf('layouts/%s/records?_offset=%s', $layout, $offset);
             $records = $this->performFMRequest('GET', $uri, []);
             $retrieved = count($records);
@@ -68,11 +64,10 @@ class FileMakerDataAPI
      * @return array|mixed
      * @throws Exception
      */
-    public function findOneBy($layout, $query)
-    {
+    public function findOneBy($layout, $query) {
         $records = $this->find($layout, $query);
 
-        if(empty($records)) {
+        if (empty($records)) {
             return [];
         }
 
@@ -88,20 +83,34 @@ class FileMakerDataAPI
      *
      * @throws Exception
      */
-    public function find(string $layout, array $query)
-    {
+    public function find(string $layout, array $query, int $limit = null) {
+
+
         $queryHash = md5(
-            serialize($query)
+                serialize($query . $limit )
         );
-        if(array_key_exists($queryHash, $this->cache)) {
+        
+        if (array_key_exists($queryHash, $this->cache)) {
             return $this->cache[$queryHash];
         }
 
         $this->setOrFetchToken();
-        $body = json_encode([
-            'query' => [$query]
-        ]);
 
+        error_log(print_r($query, true));
+
+        if ( isset($limit) && $limit > 100) {
+            error_log("limit is increased to " . $limit);
+
+            $body = json_encode([
+                'query' => [$query],
+                'limit' => $limit
+            ]);
+            error_log($body);
+        } else {
+            $body = json_encode([
+                'query' => [$query]
+            ]);
+        }
         $uri = $this->baseURI . sprintf('layouts/%s/_find', $layout);
         $records = $this->performFMRequest("POST", $uri, ['body' => $body]);
 
@@ -110,11 +119,11 @@ class FileMakerDataAPI
         return $records;
     }
 
-    public function storedQuery($query){
+    public function storedQuery($query) {
         $queryHash = md5(
-            serialize($query)
+                serialize($query)
         );
-        if(array_key_exists($queryHash, $this->cache)) {
+        if (array_key_exists($queryHash, $this->cache)) {
             return $this->cache[$queryHash];
         }
     }
@@ -127,8 +136,7 @@ class FileMakerDataAPI
      * @return array
      * @throws Exception
      */
-    private function performFMRequest($method, $uri, $options)
-    {
+    private function performFMRequest($method, $uri, $options) {
         $params = [
             'method' => $method,
             'headers' => [
@@ -137,24 +145,24 @@ class FileMakerDataAPI
             ]
         ];
 
-        if($this->settings->getDoNotVerify()) {
+        if ($this->settings->getDoNotVerify()) {
             $params['sslverify'] = false;
         }
 
         $request = new WP_Http();
         $response = $request->request($uri, array_merge($params, $options));
 
-        if($response) {
+        if ($response) {
             $responseArray = json_decode($response['body'], true);
             $responseCode = $responseArray['messages'][0]['code'];
 
-            switch($responseCode){
+            switch ($responseCode) {
                 case 0:
                     return $this->flattenRecords($responseArray['response']['data']);
                 case 401:
                     return [];
                 case 952:
-                    if(!$this->retried) {
+                    if (!$this->retried) {
                         $this->retried = true;
                         $this->fetchToken();
                         $this->performFMRequest($method, $uri, $options);
@@ -170,33 +178,30 @@ class FileMakerDataAPI
 
     private function flattenRecords(array $records) {
         $resp = [];
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $resp[] = array_merge([
                 'portalData' => $record['portalData'],
                 'recordId' => $record['recordId'],
                 'modId' => $record['modId'],
-            ], $record['fieldData']);
+                    ], $record['fieldData']);
         }
 
         return $resp;
     }
 
-    private function setBaseURL($host, $database)
-    {
-        $this->baseURI =
-            ('http' == substr($host, 4) ? $host : 'https://' . $host) .
-            ('/' == substr($host, -1) ? '' : '/') .
-            'fmi/data/v2/databases/' .
-            $database . '/';
+    private function setBaseURL($host, $database) {
+        $this->baseURI = ('http' == substr($host, 4) ? $host : 'https://' . $host) .
+                ('/' == substr($host, -1) ? '' : '/') .
+                'fmi/data/v2/databases/' .
+                $database . '/';
     }
 
     /**
      * @return string
      * @throws Exception
      */
-    private function setOrFetchToken()
-    {
-        if(!empty($_SESSION['fm-data-api-token'])) {
+    private function setOrFetchToken() {
+        if (!empty($_SESSION['fm-data-api-token'])) {
             return $this->token = $_SESSION['fm-data-api-token'];
         }
 
@@ -207,28 +212,27 @@ class FileMakerDataAPI
      * @return string
      * @throws Exception
      */
-    public function fetchToken()
-    {
+    public function fetchToken() {
         $params = [
             'method' => 'POST',
             'headers' => [
-                'Authorization' => 'Basic '.base64_encode("{$this->settings->getUsername()}:{$this->settings->getPassword()}"),
+                'Authorization' => 'Basic ' . base64_encode("{$this->settings->getUsername()}:{$this->settings->getPassword()}"),
                 'Content-Type' => 'application/json'
             ]
         ];
 
-        if($this->settings->getDoNotVerify()) {
+        if ($this->settings->getDoNotVerify()) {
             $params['sslverify'] = false;
         }
 
         $request = new WP_Http();
         $response = $request->request($this->baseURI . 'sessions', $params);
 
-        if(is_a($response, 'WP_Error')) {
-            throw new Exception(sprintf(': %s',  $response->get_error_message()));
+        if (is_a($response, 'WP_Error')) {
+            throw new Exception(sprintf(': %s', $response->get_error_message()));
         }
 
-        if($response) {
+        if ($response) {
             $responseObj = json_decode($response['body'], false);
             $responseCode = $responseObj->messages[0]->code;
 
