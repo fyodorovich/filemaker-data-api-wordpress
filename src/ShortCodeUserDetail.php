@@ -108,7 +108,7 @@ class ShortCodeUserDetail extends ShortCodeBase {
         $s .= '<tbody>';
 
         $i = 0;
-        foreach ($this->client_record['portalData']['Contracts'] as $contract) {
+        foreach (array_reverse($this->client_record['portalData']['Contracts']) as $contract) {
 
             if (!empty($contract['Transactions::Date'])) {
                 $us_date = explode("/", $contract['Transactions::Date']);
