@@ -33,7 +33,7 @@ To prevent accidental transfer of client information we are storing a UUID in us
 
 ### Pages and Permalinks
 #### Transaction Statement
-The shortcode expects the permalinks to be ON and creates an permalink to a post/page with the slug "transaction-statement."
+The shortcode expects the permalinks to be ON and creates an permalink to a post/page with the slug "contract-statement."
 
 ## Shortcodes
 The shortcodes listed below provide access to your FileMaker data.
