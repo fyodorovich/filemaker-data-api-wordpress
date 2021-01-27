@@ -116,7 +116,7 @@ class ShortCodeUserDetail extends ShortCodeBase {
             } else {
                 $nz_date = '';
             }
-            $s .= '<tr><td class="inverse"><a href="/transaction-statement/?&amp;cid=' . $i . '">&rarr;</a></td>'
+            $s .= '<tr><td class="inverse"><a href="/contract-statement/?&amp;cid=' . $i . '">&rarr;</a></td>'
                     . '<td>' . $contract['Contracts::Contract'] . '</td><td class="center">' . $nz_date . '</td>';
 
 
