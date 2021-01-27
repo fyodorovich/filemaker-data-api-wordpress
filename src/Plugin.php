@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: stevewinter
@@ -8,19 +9,18 @@
 
 namespace FMDataAPI;
 
-class Plugin
-{
+class Plugin {
+
     /** @var Admin */
     protected $admin;
 
     /** @var array */
     protected $shortcodes;
 
-    public function __construct()
-    {
+    public function __construct() {
         add_action('init', [$this, 'fmDataApiRegisterSession']);
 
-        $settings = get_option( FM_DATA_API_SETTINGS, Admin::fmDataApiDefaultOptions());
+        $settings = get_option(FM_DATA_API_SETTINGS, Admin::fmDataApiDefaultOptions());
         $api = new FileMakerDataAPI($settings);
 
         $this->admin = new Admin();
@@ -32,8 +32,10 @@ class Plugin
         ];
     }
 
-    public function fmDataApiRegisterSession(){
-        if( !session_id() )
+    public function fmDataApiRegisterSession() {
+        if (!session_id()) {
             session_start();
+        }
     }
+
 }
