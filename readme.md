@@ -5,6 +5,15 @@ At this early stage of development only 'pull' is possible. Over time this plugi
 
 The primary means of 'pulling' data is through the use of two WordPress shortcodes
 
+##Change Log
+
+2021-01-28 v0.1.2
+Reverse the display of portal data for FM-DATA-USER-DETAIL
+Override the default record limit for the transaction search. 
+
+2021-01-14 v0.1.1
+Add two new shortcodes: FM-DATA-USER-DETAIL, FM-DATA-CONTRACT-DETAIL
+
 ## Modifications made for Adelphi Finance
 For convenience and increased control we have added two shortcodes which control the display of a users contracts and the display of a contract.
 
