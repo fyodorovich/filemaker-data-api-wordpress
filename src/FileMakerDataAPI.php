@@ -85,7 +85,6 @@ class FileMakerDataAPI {
      */
     public function find(string $layout, array $query, int $limit = null) {
 
-
         $queryHash = md5(
                 serialize($query . $limit )
         );
@@ -96,16 +95,12 @@ class FileMakerDataAPI {
 
         $this->setOrFetchToken();
 
-        error_log(print_r($query, true));
-
         if ( isset($limit) && $limit > 100) {
-            error_log("limit is increased to " . $limit);
 
             $body = json_encode([
                 'query' => [$query],
                 'limit' => $limit
             ]);
-            error_log($body);
         } else {
             $body = json_encode([
                 'query' => [$query]
