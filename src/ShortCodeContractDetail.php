@@ -136,8 +136,10 @@ class ShortCodeContractDetail extends ShortCodeBase {
             $nz_date = $this->fmDate2nzDate($transaction['Date']);
             $s .= '<tr><td>' . $nz_date . '</td>';
             foreach ($transactionFields as $field) {
-                if (in_array($field, ['Amount', 'Balance', 'Debit', 'Credit'])) {
+                if (in_array($field, ['Amount',  'Debit', 'Credit'])) {
                     $s .= '<td class="rha">' . $this->formatCurrency(trim($transaction[$field])) . '</td>';
+                } elseif (in_array($field, ['Balance'])) {
+                    $s .= '<td class="rha">' . $this->formatCurrency(trim($transaction[$field]), true) . '</td>';
                 } else {
                     $s .= '<td>' . trim($transaction[$field]) . '</td>';
                 }
