@@ -76,7 +76,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
 
             $this->contract_record = $this->client_record[0]['portalData']['Contracts'][$contract_id];
 
-            $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($this->contract_record["Contracts::Contract"]));
+            $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($this->contract_record["Contracts::Contract"]),  (int) $this->contract_record["Transactions::getFoundCount"]);
 
             return $this->formatContractRecord();
         } catch (Exception $e) {
@@ -92,14 +92,14 @@ class ShortCodeContractDetail extends ShortCodeBase {
         }
         $nz_date = $this->fmDate2nzDate($this->contract_record["Transactions::Date"]);
 
-        $contractStatus = '<table style="margin-top: 3em; margin-bottom: 2em;"><tbody>'
+        $contractStatus = '<div id="contractStatus"><table style="margin-top: 3em; margin-bottom: 2em;"><tbody>'
                 .'<tr><td>Instalment due this period</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Inst. Due'], true) . '</td></tr>'
                 .'<tr><td>Arrears</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Arrears'], true) . '</td></tr>'
                 .'<tr><td>Arrears Charges</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Arr. Charges'], true) . '</td></tr>'
                 .'<tr><td>Transactions</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Transactions'], true) . '</td></tr>'
                 .'<tr><td>Total</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Total Due'], true) . '</td></tr>'
                 .'</tbody></table>'
-                .'<hr><div>An Early Settlement Fee is payable on full early repayment</div>'
+                .'<hr><div>An Early Settlement Fee is payable on full early repayment</div></div>'
                 ;
 
         return '<hr><div style="float:right"> Contract ' . $this->contract_record["Contracts::Contract"] . '</div><div class="center">Adelphi Finance Ltd</div><hr>'
@@ -109,8 +109,6 @@ class ShortCodeContractDetail extends ShortCodeBase {
                 . '<div id="address" class="">' . $this->client_record[0]['Contracts::Address'] . "<br>" . $this->client_record[0]['Contracts::City'] . '</div>'
                 . '<div id="email" class="">' . $this->client_record[0]['email'] . '</div>'
                 . '<div id="clientId" class="">Client ID # ' . $this->client_record[0]['id_client'] . '</div>'
-                // . '<div id="contractId">Contract # ' . $this->contract_record["Contracts::Contract"] . '</div>'
-                //  . '<div id="contractDate">Date: ' . $nz_date . '</div>'
                 . '<div id="transactionCount" class="">Transactions: ' . $this->contract_record['Transactions::getFoundCount'] . '</div>'
                 . '</div>'
                 . '<div id="transactions" style="padding-top:2em;">' . $transactions . '</div>'
@@ -134,7 +132,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
 
         $i = 0;
         foreach ($this->transaction_record as $transaction) {
-
+            $i++;
             $nz_date = $this->fmDate2nzDate($transaction['Date']);
             $s .= '<tr><td>' . $nz_date . '</td>';
             foreach ($transactionFields as $field) {
