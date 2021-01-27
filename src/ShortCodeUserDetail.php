@@ -107,8 +107,9 @@ class ShortCodeUserDetail extends ShortCodeBase {
         $s .= '</tr></thead>';
         $s .= '<tbody>';
 
-        $i = 0;
+        $i = $this->client_record['Contracts::getFoundCount'];
         foreach (array_reverse($this->client_record['portalData']['Contracts']) as $contract) {
+           $i--;
 
             if (!empty($contract['Transactions::Date'])) {
                 $us_date = explode("/", $contract['Transactions::Date']);
@@ -127,7 +128,6 @@ class ShortCodeUserDetail extends ShortCodeBase {
             $active = $contract['Contracts::active_contract'] ? '<td class="center">&check;</td>':'<td></td>';
            $s .= $active . '</tr>';
 
-           $i++;
         }
 
         $s .= '</tbody>';
