@@ -31,16 +31,22 @@ The user login corresponds with the Client ID and is used as a sanity check. If 
 #### User Metadata: UUID
 To prevent accidental transfer of client information we are storing a UUID in user metadata. The field is user_meta::wpcf_uuid. This UUID is generated in the FileMaker and is the ID of the table "clientmetadata."
 
+### Pages and Permalinks
+#### Transaction Statement
+The shortcode expects the permalinks to be ON and creates an permalink to a post/page with the slug "transaction-statement."
+
 ## Shortcodes
 The shortcodes listed below provide access to your FileMaker data.
+
+### Adelphi Specific Codes
 
 ### [FM-DATA-USER-DETAIL]
 Pull all contract records associated with the UUID of the logged in user. The contract records include the client name and address. A table of contracts is built including links which are based on permalinks. 
 
 ### [FM-DATA-CONTRACT-DETAIL]
-Pull all transaction records associated with the contract of the logged in user. The contract is printable as a Contract Statement.
+Pull all transaction records associated with the contract of the logged in user. The contract is printable as a Contract Statement. A table of transactions is built.
 
-A table of contracts is built including links which are based on permalinks
+### General Purpose Codes
 
 ### [FM-DATA-TABLE]
 Pull all records from the specified layout and generate a table of records.
