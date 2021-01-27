@@ -92,7 +92,7 @@ class ShortCodeBase {
     protected function formatCurrency($field, $returnZero = false) {
 
         if (empty($field) || 0 == $field) {
-            $content = $returnZero ? '0.00' : '';
+            $content = $returnZero ? '$0.00' : '';
         } else {
             if (class_exists('NumberFormatter')) {
                 $fmt = new \NumberFormatter($this->settings->getLocale(), NumberFormatter::CURRENCY);
