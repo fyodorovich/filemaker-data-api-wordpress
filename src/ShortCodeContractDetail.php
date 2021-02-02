@@ -296,7 +296,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
         $user_email = $user->user_email;
         $user_login = $user->user_login;
         $obj_id = get_queried_object_id();
-        $current_url = get_permalink($obj_id);
+        $permalink = get_permalink($obj_id);
         $msg = "Client #$user_login viewed contract #" . $this->contract_record["Contracts::Contract"];
         $context = array(
             '_action' => 'viewContract',
@@ -304,8 +304,8 @@ class ShortCodeContractDetail extends ShortCodeBase {
             '_userLogin' => $user->user_login,
             '_userEmail' => $user->user_email,
             '_contractID' => $this->contract_record["Contracts::Contract"],
-            '_pageView' => $current_url,
-            '_pageID' => $obj_id,
+            '_permalink' => $permalink,
+            '_postID' => $obj_id,
         );
 
         if ($user_email != get_option('admin_email')) {
