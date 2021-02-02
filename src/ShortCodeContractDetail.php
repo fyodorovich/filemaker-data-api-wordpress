@@ -42,7 +42,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
      */
     public function retrieveContract() {
 
-        $contract_id = filter_input(INPUT_GET, 'cid', FILTER_SANITIZE_STRING);
+        $contract_index = filter_input(INPUT_GET, 'cid', FILTER_SANITIZE_NUMBER_INT );
 
         try {
             $afl = new AFLClient();
@@ -74,7 +74,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
 //                }
 //            }
 
-            $this->contract_record = $this->client_record[0]['portalData']['Contracts'][$contract_id];
+            $this->contract_record = $this->client_record[0]['portalData']['Contracts'][$contract_index];
 
             $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($this->contract_record["Contracts::Contract"]), (int) $this->contract_record["Transactions::getFoundCount"]);
 
