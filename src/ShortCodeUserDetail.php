@@ -57,7 +57,9 @@ class ShortCodeUserDetail extends ShortCodeBase {
             $this->client_record = $this->api->findOneBy($afl->client_layout(), $this->client_query($uuid));
 
             if ($afl->client_id() !== $this->client_record['id_client']) {
-                return 'Access Denied';
+                $s = '<h3>Access Denied</h3><div>Please <a href="https://adelphi.co.nz/contact-us">contact Adelphi Finance</a> directly or <a href="https://adelphi.co.nz/message-us">send us a message</a></div>';
+
+                return $s;
             }
 
             update_user_meta(get_current_user_id(), 'client_' . $afl->client_id(), $this->client_record, false);
