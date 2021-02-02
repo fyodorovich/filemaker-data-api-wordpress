@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: stevewinter
- * Date: 28/07/2018
+ * Created by Apache Netbeans
+ * User: Malcolm Fitzgerald
+ * Date: 28/01/2020
  * Time: 13:51
  */
 
@@ -67,16 +67,16 @@ class ShortCodeContractDetail extends ShortCodeBase {
                 return 'Access Denied';
             }
 
-            foreach ($this->client_record[0]['portalData']['Contracts'] as $contract) {
-                if ($contract['Contracts::Contract'] === $contract_id) {
-                    $this->contract_record = $contract;
-                    break;
-                }
-            }
+//            foreach ($this->client_record[0]['portalData']['Contracts'] as $contract) {
+//                if ($contract['Contracts::Contract'] === $contract_id) {
+//                    $this->contract_record = $contract;
+//                    break;
+//                }
+//            }
 
             $this->contract_record = $this->client_record[0]['portalData']['Contracts'][$contract_id];
 
-            $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($this->contract_record["Contracts::Contract"]),  (int) $this->contract_record["Transactions::getFoundCount"]);
+            $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($this->contract_record["Contracts::Contract"]), (int) $this->contract_record["Transactions::getFoundCount"]);
 
             return $this->formatContractRecord();
         } catch (Exception $e) {
@@ -90,17 +90,20 @@ class ShortCodeContractDetail extends ShortCodeBase {
         } else {
             $transactions = "No transactions recorded.";
         }
+        # at this point we will record the access
+        $this->logPageView();
+
         $nz_date = $this->fmDate2nzDate($this->contract_record["Transactions::Date"]);
 
         $contractStatus = '<div id="contractStatus"><table style="margin-top: 3em; margin-bottom: 2em;"><tbody>'
-                .'<tr><td>Instalment due this period</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Inst. Due'], true) . '</td></tr>'
-                .'<tr><td>Arrears</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Arrears'], true) . '</td></tr>'
-                .'<tr><td>Arrears Charges</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Arr. Charges'], true) . '</td></tr>'
-                .'<tr><td>Transactions</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Transactions'], true) . '</td></tr>'
-                .'<tr><td>Total</td><td class="rha">' . $this->formatCurrency( contract_record['Contracts::Total Due'], true) . '</td></tr>'
-                .'</tbody></table>'
-                .'<hr><div>An Early Settlement Fee is payable on full early repayment</div></div>'
-                ;
+                . '<tr><td>Instalment due this period</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Inst. Due'], true) . '</td></tr>'
+                . '<tr><td>Arrears</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Arrears'], true) . '</td></tr>'
+                . '<tr><td>Arrears Charges</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Arr. Charges'], true) . '</td></tr>'
+                . '<tr><td>Transactions</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Transactions'], true) . '</td></tr>'
+                . '<tr><td>Total</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Total Due'], true) . '</td></tr>'
+                . '</tbody></table>'
+                . '<hr><div>An Early Settlement Fee is payable on full early repayment</div></div>'
+        ;
 
         return '<hr><div style="float:right"> Contract ' . $this->contract_record["Contracts::Contract"] . '</div><div class="center">Adelphi Finance Ltd</div><hr>'
                 . '<div class="center">Statement of Loan Account<div style="float:right"> Dated ' . date('d M Y') . '</div></div>'
@@ -112,10 +115,8 @@ class ShortCodeContractDetail extends ShortCodeBase {
                 . '<div id="transactionCount" class="">Transactions: ' . $this->contract_record['Transactions::getFoundCount'] . '</div>'
                 . '</div>'
                 . '<div id="transactions" style="padding-top:2em;">' . $transactions . '</div>'
-                . $contractStatus 
+                . $contractStatus
         ;
-
-
     }
 
     protected function formatTransactionRecords() {
@@ -136,7 +137,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
             $nz_date = $this->fmDate2nzDate($transaction['Date']);
             $s .= '<tr><td>' . $nz_date . '</td>';
             foreach ($transactionFields as $field) {
-                if (in_array($field, ['Amount',  'Debit', 'Credit'])) {
+                if (in_array($field, ['Amount', 'Debit', 'Credit'])) {
                     $s .= '<td class="rha">' . $this->formatCurrency(trim($transaction[$field])) . '</td>';
                 } elseif (in_array($field, ['Balance'])) {
                     $s .= '<td class="rha">' . $this->formatCurrency(trim($transaction[$field]), true) . '</td>';
@@ -285,6 +286,30 @@ class ShortCodeContractDetail extends ShortCodeBase {
             return ['Contract' => $contract];
         } catch (Exception $ex) {
             return $ex;
+        }
+    }
+
+    protected function logPageView() {
+
+
+        $user = wp_get_current_user();
+        $user_email = $user->user_email;
+        $user_login = $user->user_login;
+        $obj_id = get_queried_object_id();
+        $current_url = get_permalink($obj_id);
+        $msg = "Client #$user_login viewed contract #" . $this->contract_record["Contracts::Contract"];
+        $context = array(
+            '_action' => 'viewContract',
+            '_userID' => $user->ID,
+            '_userLogin' => $user->user_login,
+            '_userEmail' => $user->user_email,
+            '_contractID' => $this->contract_record["Contracts::Contract"],
+            '_pageView' => $current_url,
+            '_pageID' => $obj_id,
+        );
+
+        if ($user_email != get_option('admin_email')) {
+            apply_filters('simple_history_log', $msg, $context);
         }
     }
 
