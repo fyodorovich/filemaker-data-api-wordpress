@@ -67,13 +67,6 @@ class ShortCodeContractDetail extends ShortCodeBase {
                 return 'Access Denied';
             }
 
-//            foreach ($this->client_record[0]['portalData']['Contracts'] as $contract) {
-//                if ($contract['Contracts::Contract'] === $contract_id) {
-//                    $this->contract_record = $contract;
-//                    break;
-//                }
-//            }
-
             $this->contract_record = $this->client_record[0]['portalData']['Contracts'][$contract_index];
 
             $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($this->contract_record["Contracts::Contract"]), (int) $this->contract_record["Transactions::getFoundCount"]);
