@@ -295,7 +295,6 @@ class ShortCodeContractDetail extends ShortCodeBase {
             '_action' => 'viewContract',
             '_userID' => $user->ID,
             '_userLogin' => $user->user_login,
-            '_userEmail' => $user->user_email,
             '_contractID' => $this->contract_record["Contracts::Contract"],
             '_permalink' => $permalink,
             '_postID' => $obj_id,
