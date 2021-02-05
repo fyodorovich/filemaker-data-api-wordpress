@@ -85,6 +85,7 @@ class FileMakerDataAPI {
      */
     public function find(string $layout, array $query, int $limit = null) {
 
+
         $queryHash = md5(
                 serialize($query . $limit )
         );
@@ -92,8 +93,14 @@ class FileMakerDataAPI {
         if (array_key_exists($queryHash, $this->cache)) {
             return $this->cache[$queryHash];
         }
+        try {
 
         $this->setOrFetchToken();
+        } catch (\Exception $e) {
+            error_log($e->message);
+            mail(get_option('admin_email'), 'FM Data API Token Set/Fetch Failed', print_r($e));
+            return 'Connection could not be Authorised';
+        }
 
         if ( isset($limit) && $limit > 100) {
 
@@ -107,8 +114,13 @@ class FileMakerDataAPI {
             ]);
         }
         $uri = $this->baseURI . sprintf('layouts/%s/_find', $layout);
+        try {
         $records = $this->performFMRequest("POST", $uri, ['body' => $body]);
-
+        } catch (\Exception $e){
+            error_log($e->message);
+            mail(get_option('admin_email'), 'FM Data Request Failed', print_r($e));
+            return 'Data Request Error';
+        }
         $this->cache[$queryHash] = $records;
 
         return $records;
