@@ -2,6 +2,8 @@
 
 namespace FMDataAPI;
 
+use NumberFormatter; 
+
 class ShortCodeBase {
 
     /** @var FileMakerDataAPI */
@@ -95,7 +97,7 @@ class ShortCodeBase {
             $content = $returnZero ? '$0.00' : '';
         } else {
             if (class_exists('NumberFormatter')) {
-                $fmt = new \NumberFormatter($this->settings->getLocale(), NumberFormatter::CURRENCY);
+                $fmt = new \NumberFormatter($this->settings->getLocale(), \NumberFormatter::CURRENCY);
                 $content = $fmt->formatCurrency($field, "NZ");
             } else {
                //  $content =  number_format($field, 2);
