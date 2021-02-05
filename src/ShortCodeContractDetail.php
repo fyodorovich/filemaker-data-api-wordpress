@@ -42,37 +42,35 @@ class ShortCodeContractDetail extends ShortCodeBase {
      */
     public function retrieveContract() {
 
-        $contract_index = filter_input(INPUT_GET, 'cid', FILTER_SANITIZE_NUMBER_INT );
+        $contract_index = filter_input(INPUT_GET, 'cid', FILTER_SANITIZE_NUMBER_INT);
+
+        $afl = new AFLClient();
+
+        $uuid = $afl->client_uuid();
+
+        if (empty($afl->client_uuid())) {
+            return $this->connectionError();
+        }
+
+        $loginId = $afl->client_id();
+
+        $attr = [
+            'fields' => "id_client",
+        ];
+
+        $this->client_record = get_user_meta(get_current_user_id(), 'client_' . $afl->client_id());
+
+        if ($afl->client_id() !== $this->client_record[0]['id_client']) {
+            return 'Access Denied';
+        }
+
+        $this->contract_record = $this->client_record[0]['portalData']['Contracts'][$contract_index];
 
         try {
-            $afl = new AFLClient();
-
-            $uuid = $afl->client_uuid();
-
-            if (empty($afl->client_uuid())) {
-                return $this->connectionError();
-            }
-
-            $loginId = $afl->client_id();
-
-            $attr = [
-                'fields' => "id_client",
-            ];
-
-
-            $this->client_record = get_user_meta(get_current_user_id(), 'client_' . $afl->client_id());
-
-
-            if ($afl->client_id() !== $this->client_record[0]['id_client']) {
-                return 'Access Denied';
-            }
-
-            $this->contract_record = $this->client_record[0]['portalData']['Contracts'][$contract_index];
-
             $this->transaction_record = $this->api->find($afl->transaction_layout(), $this->transaction_query($this->contract_record["Contracts::Contract"]), (int) $this->contract_record["Transactions::getFoundCount"]);
-
             return $this->formatContractRecord();
         } catch (Exception $e) {
+            error_log($e->message);
             return $this->connectionError(true);
         }
     }
