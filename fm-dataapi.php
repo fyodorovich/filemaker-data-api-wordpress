@@ -3,7 +3,7 @@
 Plugin Name: FileMaker Data API Connector
 Plugin URI: https://businessdatasystems.co.nz/wp-fm-data-api
 Description: This plugin has been customised for Adelphi Finance
-Version: 0.1.3 (03)
+Version: 0.1.3 (04)
 Author: Malcolm Fitzgerald, Steve Winter
 Author URI: https://businessdatasystems.co.nz
 License: GPL2 or later
