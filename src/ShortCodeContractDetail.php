@@ -87,11 +87,11 @@ class ShortCodeContractDetail extends ShortCodeBase {
         $nz_date = $this->fmDate2nzDate($this->contract_record["Transactions::Date"]);
 
         $contractStatus = '<div id="contractStatus"><table style="margin-top: 3em; margin-bottom: 2em;"><tbody>'
-                . '<tr><td>Instalment due this period</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Inst. Due'], true) . '</td></tr>'
-                . '<tr><td>Arrears</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Arrears'], true) . '</td></tr>'
-                . '<tr><td>Arrears Charges</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Arr. Charges'], true) . '</td></tr>'
-                . '<tr><td>Transactions</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Transactions'], true) . '</td></tr>'
-                . '<tr><td>Total</td><td class="rha">' . $this->formatCurrency(contract_record['Contracts::Total Due'], true) . '</td></tr>'
+                . '<tr><td>Instalment due this period</td><td class="rha">' . $this->formatCurrency($this->contract_record['Contracts::Inst. Due'], true) . '</td></tr>'
+                . '<tr><td>Arrears</td><td class="rha">' . $this->formatCurrency($this->contract_record['Contracts::Arrears'], true) . '</td></tr>'
+                . '<tr><td>Arrears Charges</td><td class="rha">' . $this->formatCurrency($this->contract_record['Contracts::Arr. Charges'], true) . '</td></tr>'
+                . '<tr><td>Transactions</td><td class="rha">' . $this->formatCurrency($this->contract_record['Contracts::Transactions'], true) . '</td></tr>'
+                . '<tr><td>Total</td><td class="rha">' . $this->formatCurrency($this->contract_record['Contracts::Total Due'], true) . '</td></tr>'
                 . '</tbody></table>'
                 . '<hr><div>An Early Settlement Fee is payable on full early repayment</div></div>'
         ;
