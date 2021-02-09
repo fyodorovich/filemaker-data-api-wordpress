@@ -297,6 +297,12 @@ class ShortCodeContractDetail extends ShortCodeBase {
             '_permalink' => $permalink,
             '_postID' => $obj_id,
         );
+        if (array_key_exists('cid', $_GET) && array_key_exists('print', $_GET)) {
+            $print_option = filter_input(INPUT_GET, 'print', FILTER_SANITIZE_STRING);
+            if (in_array($print_option, ['pdf', 'print'])) {
+                $context['_output'] = $print_option;
+            }
+        }
 
         if ($user_email != get_option('admin_email')) {
             apply_filters('simple_history_log', $msg, $context);
