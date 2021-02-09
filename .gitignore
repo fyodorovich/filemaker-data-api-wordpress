@@ -1,3 +1,6 @@
 # OS and PHPStorm
 .DS_Store
 .idea/
+/nbproject/private/
+project.properties
+project.xml
