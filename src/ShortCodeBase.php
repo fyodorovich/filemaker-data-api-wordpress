@@ -2,7 +2,7 @@
 
 namespace FMDataAPI;
 
-use NumberFormatter; 
+use NumberFormatter;
 
 class ShortCodeBase {
 
@@ -96,14 +96,17 @@ class ShortCodeBase {
         if (empty($field) || 0 == $field) {
             $content = $returnZero ? '$0.00' : '';
         } else {
-            if (class_exists('NumberFormatter')) {
-                $fmt = new \NumberFormatter($this->settings->getLocale(), \NumberFormatter::CURRENCY);
-                $content = $fmt->formatCurrency($field, "NZ");
-            } else {
-               //  $content =  number_format($field, 2);
-                setlocale(LC_MONETARY, 'en_NZ.UTF-8');
-                $content = money_format('%.2n', $field);
-            }
+            setlocale(LC_MONETARY, 'en_NZ.UTF-8');
+            $content = money_format('%.2n', $field);
+
+//            if (class_exists('NumberFormatter')) {
+//                $fmt = new \NumberFormatter($this->settings->getLocale(), \NumberFormatter::CURRENCY);
+//                $content = $fmt->formatCurrency($field, "NZ");
+//            } else {
+//               //  $content =  number_format($field, 2);
+//                setlocale(LC_MONETARY, 'en_NZ.UTF-8');
+//                $content = money_format('%.2n', $field);
+//            }
         }
         return $content;
     }
