@@ -170,6 +170,9 @@ EOHTML;
                         'password' => '',
                         'verify' => 0,
                         'locale' => 'en_US',
+                        'cognito_access_token'=>'',
+                        'claris_id_token' =>'',
+                        'claris_id_refresh_token'=>'',
             ]);
         } catch (Exception $e) {
 
