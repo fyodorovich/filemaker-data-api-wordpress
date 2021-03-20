@@ -1,0 +1,31 @@
+{
+    "name": "budasy/filemaker-data-api-wordpress",
+    "description": "A WordPress Plugin that connects to FileMaker Cloud.",
+    "authors": [
+        {
+            "name": "Malcolm Fitzgerald",
+            "email": "support@businessdatasystems.co.nz"
+        }
+    ],
+    "keywords": [
+      "FileMaker Cloud",
+      "PHP",
+      "Cognito",
+      "DataAPI",
+      "REST"
+   ],
+    "homepage": "https://businessdatasystems.co.nz",
+    "version": "1.0.0",
+    "license": "© 2021 Business Data Systems",
+
+    "require": {
+        "league/csv": "dev-master",
+        "aws/aws-sdk-php": "^3.173",
+        "nesbot/carbon": "^2.45",
+        "phpseclib/phpseclib": "^3.0",
+        "guzzlehttp/guzzle": "^7.2"        
+    },
+    "require-dev": {
+        "nette/tester": "dev-master"
+    }
+}
