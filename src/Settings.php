@@ -1,8 +1,8 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: stevewinter
- * Date: 28/07/2018
+ * User: Malcolm Fitzgerald, stevewinter
+ * Date: 2021-03-18
  * Time: 12:59
  */
 
@@ -10,9 +10,9 @@ namespace FMDataAPI;
 
 use \Exception;
 
-class Settings
-{
-    const DATA_API_PARAMETERS = ['server', 'port', 'database', 'username', 'password', 'verify', 'locale'];
+class Settings {
+
+    const DATA_API_PARAMETERS = ['server', 'port', 'database', 'username', 'password', 'verify', 'locale', 'refreshToken', '$refreshTokenExpires'];
 
     protected $server;
     protected $port;
@@ -21,6 +21,8 @@ class Settings
     protected $password;
     protected $verify;
     protected $locale;
+    protected $refreshToken;
+    protected $refreshTokenExpires;
 
     /**
      * @param array $array
@@ -28,11 +30,10 @@ class Settings
      * @return Settings
      * @throws Exception
      */
-    public static function CreateFromArray(array $array)
-    {
+    public static function CreateFromArray(array $array) {
         $settings = new static();
-        foreach(static::DATA_API_PARAMETERS as $parameter) {
-            if(!array_key_exists($parameter, $array)) {
+        foreach (static::DATA_API_PARAMETERS as $parameter) {
+            if (!array_key_exists($parameter, $array)) {
                 throw new Exception(sprintf('Missing parameter %s', $parameter));
             }
 
@@ -45,64 +46,73 @@ class Settings
     /**
      * @return string
      */
-    public function getServer()
-    {
+    public function getServer() {
         return $this->server;
     }
 
     /**
      * @return int
      */
-    public function getPort()
-    {
+    public function getPort() {
         return $this->port;
     }
 
     /**
      * @return string
      */
-    public function getDatabase()
-    {
+    public function getDatabase() {
         return $this->database;
     }
 
     /**
      * @return string
      */
-    public function getUsername()
-    {
+    public function getUsername() {
         return $this->username;
     }
 
     /**
      * @return string
      */
-    public function getPassword()
-    {
+    public function getPassword() {
         return $this->password;
     }
 
     /**
      * @return string
      */
-    public function getLocale()
-    {
+    public function getLocale() {
         return $this->locale;
     }
 
     /**
      * @return boolean
      */
-    public function getDoNotVerify()
-    {
+    public function getDoNotVerify() {
         return $this->verify;
     }
 
     /**
-    * @return boolean
-    */
-    public function getVerify()
-    {
+     * @return boolean
+     */
+    public function getVerify() {
         return $this->verify;
     }
+
+    /**
+     * 
+     * @return string
+     */
+    public function getRefreshToken() {
+        return $this->refreshToken;
+    }
+
+    /**
+     * 
+     * @return date
+     */
+    public function getRefreshTokenExpires() {
+        return $this->refreshTokenExpires;
+    }
+
 }
