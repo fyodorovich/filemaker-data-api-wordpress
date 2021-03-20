@@ -15,6 +15,7 @@ define('FM_DATA_API_SETTINGS', 'fm-dataapi_settings');
 define('FM_DATA_API_PLUGIN_DIR', untrailingslashit( dirname( __FILE__ ) ) );
 define('FM_DATA_API_BASENAME', plugin_basename( __FILE__ ) );
 
+require_once FM_DATA_API_PLUGIN_DIR . '/vendor/autoload.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/Locales.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/FileMakerDataAPI.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/Plugin.php';
@@ -23,9 +24,12 @@ require_once FM_DATA_API_PLUGIN_DIR . '/src/Settings.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeBase.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeField.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeTable.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/AFLClient.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeUserDetail.php';
 require_once FM_DATA_API_PLUGIN_DIR . '/src/ShortCodeContractDetail.php';
-require_once FM_DATA_API_PLUGIN_DIR . '/src/AFLClient.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/AwsCognitoAuthSRP.class.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/AwsCognitoAuthentication.class.php';
+require_once FM_DATA_API_PLUGIN_DIR . '/src/ClarisCloudAuth.class.php';
 
 new FMDataAPI\Plugin();
 
