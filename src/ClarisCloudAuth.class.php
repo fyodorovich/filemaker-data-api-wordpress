@@ -260,6 +260,11 @@ class ClarisCloudAuth {
      */ private function setRefreshTokens($tokens) {
         $this->refresh_token = $tokens['AuthenticationResult']['RefreshToken'];
         $this->refresh_token_expires_at = time() + 31536000; // use for one year
+
+        $default = \FMDataAPI\Admin::fmDataApiDefaultOptions();
+        $settings = get_option(FM_DATA_API_SETTINGS, $default);
+        $settings = array_merge($settings , ['refreshToken'=>$this->refresh_token , 'refreshTokenExpires'=>$this->refresh_token_expires_at]);
+        update_option(FM_DATA_API_SETTINGS, $settings);
     }
 
     /**
