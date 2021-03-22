@@ -11,7 +11,7 @@ License: Commercial Copyright and portions GPL2 or later
 
 // Only run as part of WordPress
 defined( 'ABSPATH' ) or die( 'Access denied - this plugin must be run as part of WordPress!' );
-define('FM_DATA_API_SETTINGS', 'fm-dataapi_settings');
+define('FM_DATA_API_SETTINGS', 'budasy_cfmc_dapi_settings');
 define('FM_DATA_API_PLUGIN_DIR', untrailingslashit( dirname( __FILE__ ) ) );
 define('FM_DATA_API_BASENAME', plugin_basename( __FILE__ ) );
 
