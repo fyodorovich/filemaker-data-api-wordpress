@@ -120,7 +120,7 @@ class Settings {
      * 
      * @return boolean
      */
-    public function usingCognito() {
+    public function getUsingCognito() {
         return $this->usingCognito;
     }
 
