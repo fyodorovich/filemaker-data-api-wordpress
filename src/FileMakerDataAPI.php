@@ -11,8 +11,6 @@ namespace FMDataAPI;
 use \WP_Http;
 use \Exception;
 use \ClarisCloudAuth;
-use \AWSCognitoAuthentication;
-use \AwsCognitoAuthSRP;
 
 class FileMakerDataAPI {
 
@@ -89,22 +87,22 @@ class FileMakerDataAPI {
 
 
         $queryHash = md5(
-                serialize($query . $limit )
+                serialize($query . $limit)
         );
-        
+
         if (array_key_exists($queryHash, $this->cache)) {
             return $this->cache[$queryHash];
         }
         try {
 
-        $this->setOrFetchToken();
+            $this->setOrFetchToken();
         } catch (\Exception $e) {
             error_log($e->message);
             mail(get_option('admin_email'), 'FM Data API Token Set/Fetch Failed', print_r($e));
             return 'Connection could not be Authorised';
         }
 
-        if ( isset($limit) && $limit > 100) {
+        if (isset($limit) && $limit > 100) {
 
             $body = json_encode([
                 'query' => [$query],
@@ -117,8 +115,8 @@ class FileMakerDataAPI {
         }
         $uri = $this->baseURI . sprintf('layouts/%s/_find', $layout);
         try {
-        $records = $this->performFMRequest("POST", $uri, ['body' => $body]);
-        } catch (\Exception $e){
+            $records = $this->performFMRequest("POST", $uri, ['body' => $body]);
+        } catch (\Exception $e) {
             error_log($e->message);
             mail(get_option('admin_email'), 'FM Data Request Failed', print_r($e));
             return 'Data Request Error';
@@ -218,19 +216,39 @@ class FileMakerDataAPI {
     }
 
     /**
+     * Get a token for use with Bearer TOKEN
      * @return string
      * @throws Exception
      */
     public function fetchToken() {
-        if ( $this->settings->getUsingCognito() ) {
-            $cca = new \ClarisCloudAuth($this->settings->getUsername(), $this->settings->getPassword()) ; 
-            $apiToken = $cca->getApiToken($this->settings->getDatabase());
-            
-        } 
-          return  $this->fetchOnPremToken(); 
+
+        if ($this->settings->getUsingCognito()) {
+            return $this->fetchCognitoAPIToken();
+        }
+
+        return $this->fetchOnPremToken();
     }
-    
-    private function fetchOnPremToken(){
+
+    /**
+     * Get Token for Claris Cloud server
+     * @return string API Token for Claris FM Cloud
+     */
+    private function fetchCognitoAPIToken() {
+        $cca = new \ClarisCloudAuth($this->settings->getUsername(), $this->settings->getPassword());
+        $this->token = $cca->getApiToken($this->settings->getDatabase());
+        $_SESSION['fm-data-api-token'] = $this->token;
+        session_write_close();
+        //other plugins can restart a session again via session_start()
+        // see https://core.trac.wordpress.org/ticket/47320
+        return $this->token;
+    }
+
+    /**
+     * Get Token for On Premise Server
+     * @return string ID token
+     * @throws Exception
+     */
+    private function fetchOnPremToken() {
         $params = [
             'method' => 'POST',
             'headers' => [
