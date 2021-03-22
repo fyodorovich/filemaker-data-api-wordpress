@@ -10,6 +10,9 @@ namespace FMDataAPI;
 
 use \WP_Http;
 use \Exception;
+use \ClarisCloudAuth;
+use \AWSCognitoAuthentication;
+use \AwsCognitoAuthSRP;
 
 class FileMakerDataAPI {
 
@@ -219,6 +222,15 @@ class FileMakerDataAPI {
      * @throws Exception
      */
     public function fetchToken() {
+        if ( $this->settings->getUsingCognito() ) {
+            $cca = new \ClarisCloudAuth($this->settings->getUsername(), $this->settings->getPassword()) ; 
+            $apiToken = $cca->getApiToken($this->settings->getDatabase());
+            
+        } 
+          return  $this->fetchOnPremToken(); 
+    }
+    
+    private function fetchOnPremToken(){
         $params = [
             'method' => 'POST',
             'headers' => [
