@@ -12,10 +12,11 @@ use \Exception;
 
 class Settings {
 
-    const DATA_API_PARAMETERS = ['server', 'port', 'database', 'username', 'password', 'verify', 'locale', 'refreshToken', '$refreshTokenExpires'];
+    const DATA_API_PARAMETERS = ['host', 'port', 'usingCognito','database', 'username', 'password', 'verify', 'locale', 'refreshToken', '$refreshTokenExpires'];
 
-    protected $server;
+    protected $host;
     protected $port;
+    protected $usingCognito;
     protected $database;
     protected $username;
     protected $password;
@@ -23,7 +24,7 @@ class Settings {
     protected $locale;
     protected $refreshToken;
     protected $refreshTokenExpires;
-
+ 
     /**
      * @param array $array
      *
@@ -47,7 +48,7 @@ class Settings {
      * @return string
      */
     public function getServer() {
-        return $this->server;
+        return $this->host;
     }
 
     /**
@@ -109,10 +110,18 @@ class Settings {
 
     /**
      * 
-     * @return date
+     * @return unix time stamp
      */
     public function getRefreshTokenExpires() {
         return $this->refreshTokenExpires;
+    }
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function usingCognito() {
+        return $this->usingCognito;
     }
 
 }
