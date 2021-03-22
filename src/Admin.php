@@ -74,7 +74,7 @@ class Admin {
         $html .= <<<EOHTML
         <div class="wrap">
         <h2>FileMaker Data API settings</h2>
-        <p>Enter the settings for your FileMaker sserver below. All fields are required!</p>
+        <p>Enter the settings for your FileMaker server below. All fields are required!</p>
         <hr />
         <form name="form1" method="post" action="">
             <input type="hidden" name="{$postField}" value="Y">
@@ -89,8 +89,9 @@ EOHTML;
                     $html .= $this->localeSettingSelector($value);
                     break;
                 case 'verify':
+                case 'usingCognito':
                     $html .= $this->verifyCheckbox($value);
-                    break;
+                    break;                
                 default:
                     $html .= $this->inputBox($setting, $title, $value);
             }
@@ -160,7 +161,7 @@ EOHTML;
     public static function fmDataApiDefaultOptions() {
         try {
             return Settings::CreateFromArray([
-                        'server' => '',
+                        'host' => '',
                         'port' => '443',
                         'database' => '',
                         'username' => '',
@@ -169,6 +170,7 @@ EOHTML;
                         'locale' => 'en_US',
                         'refreshToken'=>'',
                         'refreshTokenExpires'=>'',
+                        'cognito' => true
             ]);
         } catch (Exception $e) {
 
