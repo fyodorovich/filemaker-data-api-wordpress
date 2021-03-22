@@ -50,7 +50,6 @@ class Admin {
             try {
                 $api = new FileMakerDataAPI($settings);
                 $api->fetchToken();
-
                 $html .= '<div class="updated"><p><strong>Success! A connection was made to FileMaker.</strong></p></div>';
             } catch (Exception $e) {
                 $html .= sprintf('<div class="error"><p><strong>Oh dear! Unable to connect to FileMaker with message %s.</strong></p></div>', $e->getMessage());
@@ -61,11 +60,9 @@ class Admin {
                 update_option(FM_DATA_API_SETTINGS, $settings);
                 $html .= '<div class="updated"><p><strong>Your server settings have been saved.</strong></p></div>';
 
-
                 try {
                     $api = new FileMakerDataAPI($settings);
                     $api->fetchToken();
-
                     $html .= '<div class="updated"><p><strong>Success! A connection was made to FileMaker.</strong></p></div>';
                 } catch (Exception $e) {
                     $html .= sprintf('<div class="error"><p><strong>Oh dear! Unable to connect to FileMaker with message %s.</strong></p></div>', $e->getMessage());
@@ -170,9 +167,8 @@ EOHTML;
                         'password' => '',
                         'verify' => 0,
                         'locale' => 'en_US',
-                        'cognito_access_token'=>'',
-                        'claris_id_token' =>'',
-                        'claris_id_refresh_token'=>'',
+                        'refreshToken'=>'',
+                        'refreshTokenExpires'=>'',
             ]);
         } catch (Exception $e) {
 
