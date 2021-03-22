@@ -21,7 +21,9 @@ class Plugin {
 
         $settings = get_option(FM_DATA_API_SETTINGS, Admin::fmDataApiDefaultOptions());
         $api = new FileMakerDataAPI($settings);
-
+        
+        // error_log(print_r($settings), true );
+        
         $this->admin = new Admin();
         $this->shortcodes = [
             new ShortCodeField($api, $settings),
