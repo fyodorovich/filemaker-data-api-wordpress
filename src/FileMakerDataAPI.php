@@ -27,7 +27,7 @@ class FileMakerDataAPI {
 
     public function __construct(Settings $settings) {
         $this->settings = $settings;
-        $this->setBaseURL($settings->getServer(), $settings->getDatabase());
+        $this->setBaseURL($settings->getHost(), $settings->getDatabase());
     }
 
     /**
@@ -234,8 +234,13 @@ class FileMakerDataAPI {
      * @return string API Token for Claris FM Cloud
      */
     private function fetchCognitoAPIToken() {
-        $cca = new \ClarisCloudAuth($this->settings->getUsername(), $this->settings->getPassword());
-        $this->token = $cca->getApiToken($this->settings->getDatabase());
+        $cca = new \ClarisCloudAuth();
+        $cca->setHost($this->settings->getHost());
+        $cca->setDatabase($this->settings->getDatabase());
+        $cca->setUsername($this->settings->getUsername());
+        $cca->setPassword($this->settings->getPassword());
+        $apiToken = $cca->dataLogin();
+        $this->token = $apiToken['api_token']; 
         $_SESSION['fm-data-api-token'] = $this->token;
         session_write_close();
         //other plugins can restart a session again via session_start()
