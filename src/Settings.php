@@ -47,7 +47,7 @@ class Settings {
     /**
      * @return string
      */
-    public function getServer() {
+    public function getHost() {
         return $this->host;
     }
 
