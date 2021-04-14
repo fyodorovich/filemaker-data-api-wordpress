@@ -49,7 +49,6 @@ class ShortCodeUserDetail extends ShortCodeBase {
                 'fields' => "id_client",
             ];
 
-
             if (empty($afl->client_uuid())) {
                 return $this->connectionError();
             }
@@ -92,7 +91,6 @@ class ShortCodeUserDetail extends ShortCodeBase {
             'Contracts::Inst. Due',
             'Contracts::Arrears',
             'Contracts::Total Due',
-            
         ];
         $contractLabels = [
             'Contract',
@@ -111,7 +109,7 @@ class ShortCodeUserDetail extends ShortCodeBase {
 
         $i = $this->client_record['Contracts::getFoundCount'];
         foreach (array_reverse($this->client_record['portalData']['Contracts']) as $contract) {
-           $i--;
+            $i--;
 
             if (!empty($contract['Transactions::Date'])) {
                 $us_date = explode("/", $contract['Transactions::Date']);
@@ -119,17 +117,17 @@ class ShortCodeUserDetail extends ShortCodeBase {
             } else {
                 $nz_date = '';
             }
-            $s .= '<tr><td class="inverse"><a href="/contract-statement/?&amp;cid=' . $i . '">&rarr;</a></td>'
-                    . '<td>' . $contract['Contracts::Contract'] . '</td><td class="center">' . $nz_date . '</td>';
-
+            $s .= '<tr><td class="inverse center"><a href="/contract-statement/?&amp;cid=' . $i . '">&#10140;</a></td>'
+                    . '<td class="center">' . $contract['Contracts::Contract'] . '</td><td class="center">' . $nz_date . '</td>';
 
             foreach ($contractFields as $field) {
                 $s .= '<td class="rha">' . $this->formatCurrency(trim($contract[$field])) . '</td>';
             }
 
-            $active = $contract['Contracts::active_contract'] ? '<td class="center">&check;</td>':'<td></td>';
-           $s .= $active . '</tr>';
-
+            $s .= '<td class="center">'; 
+            $s .= $contract['Contracts::active_contract'] ? 'Yes' : 'No';
+            
+            $s .= '</td></tr>';
         }
 
         $s .= '</tbody>';
@@ -137,7 +135,6 @@ class ShortCodeUserDetail extends ShortCodeBase {
         $s .= "* Instalment due";
         return '<div id="contractRecords">' . $s . '</div>';
     }
-
 
     /**
      * @param string $queryString
@@ -161,13 +158,11 @@ class ShortCodeUserDetail extends ShortCodeBase {
     private function generateTable(array $records, array $attr) {
         $fields = explode('|', $attr['fields']);
 
-
         $types = array_key_exists('types', $attr) ? explode('|', $attr['types']) : [];
 
         $html = '<table>';
         $html .= array_key_exists('labels', $attr) ? $this->generateHeaderRow($attr['labels']) : $this->generateHeaderRow($attr['fields']);
         $html .= '<tbody>';
-
 
         foreach ($records as $record) {
             $link = array_key_exists('id-field', $attr) && array_key_exists('detail-url', $attr) ? str_replace('*id*', $record[$attr['id-field']], $attr['detail-url']) : '';
@@ -204,7 +199,7 @@ class ShortCodeUserDetail extends ShortCodeBase {
 
     /**
      * Generate the query string required to obtain Client details from FileMaker Pro
-     * @return empty string','array','Exception
+     * @return array,Exception
      */
     protected function client_query(string $uuid) {
 
