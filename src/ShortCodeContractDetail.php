@@ -115,7 +115,7 @@ class ShortCodeContractDetail extends ShortCodeBase {
         $transactionFields = ['TX Code', 'Details', 'Debit', 'Credit', 'Balance'];
         $transactionLabels = ['Date', 'Code', 'Reference', 'Debit', 'Credit', 'Balance'];
 
-        $s = '<table class="w3-table w3-bordered"><thead><tr class="head">';
+        $s = '<table class="w3-table w3-bordered rh-border-true"><thead><tr class="head">';
         foreach ($transactionLabels as $field) {
             $s .= '<td class="center">' . $field . '</td>';
         }
