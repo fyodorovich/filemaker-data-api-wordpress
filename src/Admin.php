@@ -14,7 +14,7 @@ use \Exception;
 class Admin {
 
     public function __construct() {
-        add_action('admin_menu', [$this, 'fmDataApiMenu']);
+        add_action('admin_menu', [$this, 'fmsApiMenu']);
         add_filter('plugin_action_links_' . FM_DATA_API_BASENAME, [$this, 'fmDataApiSettingsLink']);
     }
 
@@ -24,8 +24,8 @@ class Admin {
         return $links;
     }
 
-    function fmDataApiMenu() {
-        add_options_page('FileMaker Data API settings', 'FM Data API', 'manage_options', 'fm-data-api', [$this, 'fmDataApiOptions']);
+    function fmsApiMenu() {
+        add_options_page('FileMaker Server API settings', 'FMS API', 'manage_options', 'fm-data-api', [$this, 'fmDataApiOptions']);
     }
 
     /**
@@ -170,7 +170,7 @@ EOHTML;
                         'locale' => 'en_US',
                         'refreshToken'=>'',
                         'refreshTokenExpires'=>'',
-                        'cognito' => true
+                        'usingCognito' => true
             ]);
         } catch (Exception $e) {
 
