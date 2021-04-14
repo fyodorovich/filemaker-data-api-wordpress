@@ -89,9 +89,11 @@ EOHTML;
                     $html .= $this->localeSettingSelector($value);
                     break;
                 case 'verify':
-                case 'usingCognito':
                     $html .= $this->verifyCheckbox($value);
-                    break;                
+                    break;
+                case 'usingCognito':
+                    $html .= $this->cognitoCheckbox($value);
+                    break;
                 default:
                     $html .= $this->inputBox($setting, $title, $value);
             }
@@ -155,6 +157,22 @@ EOHTML;
 EOHTML;
     }
 
+    private function cognitoCheckbox($value) {
+        $checked = $value ? ' checked' : '';
+        return <<<EOHTML
+            <tr>
+                <th scope="row"><label for="usingCognito"></label></th>
+                <td>
+                    <input type="hidden" name="verify" value="0">
+                    <input type="checkbox" name="usingCognito" value="1" {$checked} />
+                    <span style="font-size: 11px">
+                        This is a Claris FileMaker Cloud host.
+                    </span>
+                </td>
+            </tr>
+EOHTML;
+    }
+
     /**
      * @return Settings
      */
@@ -168,12 +186,12 @@ EOHTML;
                         'password' => '',
                         'verify' => 0,
                         'locale' => 'en_US',
-                        'refreshToken'=>'',
-                        'refreshTokenExpires'=>'',
+                        'refreshToken' => '',
+                        'refreshTokenExpires' => '',
                         'usingCognito' => true
             ]);
         } catch (Exception $e) {
-
+            
         }
     }
 
