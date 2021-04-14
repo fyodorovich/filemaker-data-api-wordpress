@@ -12,7 +12,7 @@ use \Exception;
 
 class Settings {
 
-    const DATA_API_PARAMETERS = ['host', 'port', 'usingCognito','database', 'username', 'password', 'verify', 'locale', 'refreshToken', '$refreshTokenExpires'];
+    const DATA_API_PARAMETERS = ['host', 'port', 'usingCognito','database', 'username', 'password', 'verify', 'locale', 'refreshToken', 'refreshTokenExpires'];
 
     protected $host;
     protected $port;
